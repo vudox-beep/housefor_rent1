@@ -66,17 +66,7 @@ require __DIR__.'/auth.php';
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
-Route::get('/debug-mail', function () {
-    try {
-        \Illuminate\Support\Facades\Mail::raw('Test email from server.', function ($message) {
-            $message->to(config('mail.from.address'))
-                    ->subject('Debug Test');
-        });
-        return 'Email sent successfully!';
-    } catch (\Exception $e) {
-        return 'Error sending email: ' . $e->getMessage();
-    }
-});
+// Lenco payment routes
 Route::get('/payments/lenco/form', [LencoPaymentController::class, 'showPaymentForm'])->name('payments.lenco.form');
 Route::post('/payments/lenco/submit', [LencoPaymentController::class, 'submitPayment'])->name('payments.lenco.submit');
 Route::post('/payments/lenco/initiate', [LencoPaymentController::class, 'initiateMobileMoneyPayment'])->name('payments.lenco.initiate')->middleware('auth');

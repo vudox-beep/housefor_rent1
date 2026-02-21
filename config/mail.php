@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', config('house_keys.mail.mailer', 'smtp')),
+    'default' => env('MAIL_MAILER', 'log'),
 
     /*
     |--------------------------------------------------------------------------
@@ -41,11 +41,11 @@ return [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
             'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', config('house_keys.mail.host', '127.0.0.1')),
-            'port' => env('MAIL_PORT', config('house_keys.mail.port', 2525)),
-            'username' => env('MAIL_USERNAME', config('house_keys.mail.username')),
-            'password' => env('MAIL_PASSWORD', config('house_keys.mail.password')),
-            'encryption' => env('MAIL_ENCRYPTION', config('house_keys.mail.encryption', 'tls')),
+            'host' => env('MAIL_HOST', '127.0.0.1'),
+            'port' => env('MAIL_PORT', 2525),
+            'encryption' => env('MAIL_ENCRYPTION'),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
@@ -112,8 +112,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', config('house_keys.mail.from_address', 'hello@example.com')),
-        'name' => env('MAIL_FROM_NAME', config('house_keys.mail.from_name', 'Example')),
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
 ];
