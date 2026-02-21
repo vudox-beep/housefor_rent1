@@ -107,7 +107,6 @@
                         <select name="role" class="auth-select" required>
                             <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
                             <option value="dealer" {{ old('role') == 'dealer' ? 'selected' : '' }}>Dealer</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         </select>
                         @error('role')
                             <span class="error-message">{{ $message }}</span>

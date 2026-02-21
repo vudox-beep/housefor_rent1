@@ -39,7 +39,7 @@ class RegisteredUserController extends Controller
             'phone' => ['required', 'string'],
             'phone_code' => ['required', 'string'],
             'color' => ['nullable', 'string', 'max:20'],
-            'role' => ['required', 'string', 'in:user,dealer,admin'],
+            'role' => ['required', 'string', 'in:user,dealer'],
         ]);
 
         $user = User::create([
@@ -60,9 +60,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        if ($user->role === 'admin') {
-            return redirect(route('admin.dashboard', absolute: false));
-        } elseif ($user->role === 'dealer') {
+        if ($user->role === 'dealer') {
             return redirect(route('dealer.dashboard', absolute: false));
         }
 
