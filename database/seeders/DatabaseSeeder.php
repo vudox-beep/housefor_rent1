@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             DealerSeeder::class,
+            SettingsSeeder::class,
         ]);
 
         // User::factory(10)->create();
