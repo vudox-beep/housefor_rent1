@@ -5,6 +5,7 @@ use App\Http\Controllers\ListingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DealerController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ReportController;
@@ -18,6 +19,13 @@ Route::post('/reports', [ReportController::class, 'store'])->middleware('auth')-
 Route::get('/', [ListingController::class, 'home'])->name('home');
 
 Route::get('/dashboard', function () {
+    $user = Auth::user();
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    if ($user->role === 'dealer') {
+        return redirect()->route('dealer.dashboard');
+    }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
