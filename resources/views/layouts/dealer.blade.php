@@ -86,6 +86,27 @@
             if (!sidebar) return;
             sidebar.classList.toggle('open');
         }
+
+        // Close sidebar when clicking anywhere outside it
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (!sidebar) return;
+            
+            // Only on mobile/tablet view when sidebar is visible
+            const isToggleActive = window.getComputedStyle(sidebarToggle).display !== 'none';
+            
+            if (isToggleActive && sidebar.classList.contains('open')) {
+                // Check if click is outside sidebar and not on the toggle button
+                const isClickOnSidebar = sidebar.contains(event.target);
+                const isClickOnToggle = sidebarToggle.contains(event.target);
+                
+                if (!isClickOnSidebar && !isClickOnToggle) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
     </script>
 </body>
 </html>

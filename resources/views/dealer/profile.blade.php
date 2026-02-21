@@ -3,7 +3,7 @@
 @section('title', 'My Profile')
 
 @section('content')
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
         <!-- Profile Details -->
         <div class="card">
             <div class="card-header">
