@@ -139,16 +139,24 @@
 .menu-toggle {
     display: none;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
     cursor: pointer;
     z-index: 1001;
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s;
+}
+
+.menu-toggle:hover {
+    background-color: var(--light-bg);
 }
 
 .bar {
-    width: 25px;
-    height: 3px;
+    width: 24px;
+    height: 2px;
     background-color: var(--dark-text);
-    transition: 0.3s;
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
 }
 
 @media (max-width: 768px) {
@@ -157,23 +165,35 @@
     }
 
     .nav-links, .auth-links {
-        display: none; /* Hidden by default on mobile */
+        display: none;
         flex-direction: column;
         width: 100%;
         text-align: center;
-        gap: 1.5rem;
+        gap: 1rem;
+        padding: 1rem 0;
     }
 
     /* Mobile Menu Active State */
+    .navbar.active {
+        background-color: var(--white);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
     .navbar.active .nav-links, 
     .navbar.active .auth-links {
         display: flex;
+        animation: slideDown 0.3s ease-out forwards;
+    }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .navbar.active .container {
         flex-direction: column;
         align-items: flex-start;
-        padding-bottom: 1rem;
+        padding-bottom: 1.5rem;
     }
     
     .navbar.active .menu-toggle {
@@ -191,6 +211,20 @@
     }
     .navbar.active .bar:nth-child(3) {
         transform: rotate(-45deg) translate(5px, -6px);
+    }
+    
+    /* Mobile Buttons */
+    .auth-links .btn-login,
+    .auth-links .btn-primary {
+        width: 100%;
+        justify-content: center;
+        padding: 0.8rem;
+        border-radius: var(--radius-md);
+    }
+    
+    .auth-links .btn-login {
+        border: 1px solid var(--border-color);
+        background-color: var(--white);
     }
 
     .footer-content {

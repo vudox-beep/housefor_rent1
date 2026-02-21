@@ -149,8 +149,72 @@
 
 /* Responsive adjustments for search bar */
 @media (max-width: 992px) {
+    .hero .container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    
+    .hero-text {
+        text-align: center;
+        margin: 0 auto;
+        max-width: 700px;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .hero-image-wrapper {
+        height: 400px;
+        margin-bottom: 2rem;
+    }
+
     .search-form {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .search-wrapper {
+        position: relative;
+        bottom: auto;
+        margin-top: -60px;
+        padding: 0 1.5rem;
+    }
+    
+    .hero {
+        padding-bottom: 2rem;
+    }
+    
+    .categories-section {
+        padding-top: 4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero .container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .hero-text {
+        text-align: center;
+        margin: 0 auto;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .hero-image-wrapper {
+        height: 300px;
+        margin-bottom: 2rem;
+    }
+    
+    .search-wrapper {
+        margin-top: -60px; /* Pull up into image */
     }
 }
 
@@ -161,7 +225,27 @@
     }
     
     .search-container {
-        padding: 1.5rem;
+        padding: 1.25rem;
+        border-radius: var(--radius-lg);
+    }
+    
+    .search-wrapper {
+        padding: 0 1rem; /* Touches the edges (bars) more closely */
+        margin-top: -40px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-search {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -346,31 +430,4 @@
 
 
 /* Responsive */
-@media (max-width: 960px) {
-    .hero .container {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-    }
-    
-    .hero-text {
-        text-align: center;
-        margin: 0 auto;
-    }
-    
-    .hero-buttons {
-        justify-content: center;
-    }
-    
-    .hero-image-wrapper {
-        height: 350px;
-    }
-    
-    .search-form {
-        grid-template-columns: 1fr;
-    }
-    
-    .btn-search {
-        width: 100%;
-        justify-content: center;
-    }
-}
+/* Styles moved to specific breakpoints above */

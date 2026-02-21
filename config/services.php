@@ -36,20 +36,20 @@ return [
     ],
 
     'google' => [
-        'client_id' => env('GOOGLE_CLIENT_ID'),
-        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT'),
+        'client_id' => env('GOOGLE_CLIENT_ID', config('house_keys.google.client_id')),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET', config('house_keys.google.client_secret')),
+        'redirect' => env('GOOGLE_REDIRECT', config('house_keys.google.redirect')),
     ],
 
     'google_maps' => [
-        'key' => env('GOOGLE_MAPS_API_KEY'),
+        'key' => env('GOOGLE_MAPS_API_KEY', config('house_keys.google.maps_key')),
     ],
 
     'lenco' => [
-        'base_url' => env('LENCO_BASE_URL', 'https://api.lenco.co/access/v2'),
-        'key' => env('LENCO_KEY'),
-        'secret' => env('LENCO_SECRET'),
-        'webhook_secret' => env('LENCO_WEBHOOK_SECRET'),
+        'base_url' => env('LENCO_BASE_URL', config('house_keys.lenco.base_url', 'https://api.lenco.co/access/v2')),
+        'key' => env('LENCO_KEY', config('house_keys.lenco.key')),
+        'secret' => env('LENCO_SECRET', config('house_keys.lenco.secret')),
+        'webhook_secret' => env('LENCO_WEBHOOK_SECRET', config('house_keys.lenco.webhook_secret')),
     ],
 
 ];
