@@ -243,7 +243,7 @@
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
                                         @php
                                             $imagePath = $listing->images[0];
-                                            $imageUrl = asset(str_starts_with($imagePath, '/') ? $imagePath : '/storage/' . ltrim($imagePath, '/'));
+                                            $imageUrl = asset($imagePath);
                                         @endphp
                                         <img src="{{ $imageUrl }}" alt="{{ $listing->title }}" class="listing-image" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
                                     @else

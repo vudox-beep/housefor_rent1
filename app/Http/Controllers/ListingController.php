@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 class ListingController extends Controller
@@ -162,18 +161,29 @@ class ListingController extends Controller
                 $images = array_slice($images, 0, 1);
             }
             
+            // Ensure directory exists
+            if (!file_exists(public_path('uploads/listings'))) {
+                mkdir(public_path('uploads/listings'), 0755, true);
+            }
+            
             foreach ($images as $image) {
-                // Store in 'public/listings' directory
-                $path = $image->store('listings', 'public');
-                // Create a full URL or relative path that can be used with asset() or storage link
-                $imagePaths[] = $path;
+                // Store directly in public/uploads/listings for immediate accessibility
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/listings'), $filename);
+                $imagePaths[] = 'uploads/listings/' . $filename;
             }
         }
 
         $videoPath = null;
         if ($canUploadVideo && $request->hasFile('video_file')) {
-            $path = $request->file('video_file')->store('listings/videos', 'public');
-            $videoPath = $path;
+            // Ensure directory exists
+            if (!file_exists(public_path('uploads/videos'))) {
+                mkdir(public_path('uploads/videos'), 0755, true);
+            }
+            $videoFile = $request->file('video_file');
+            $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
+            $videoFile->move(public_path('uploads/videos'), $filename);
+            $videoPath = 'uploads/videos/' . $filename;
         } elseif ($canUploadVideo && !empty($validated['video_url'])) {
             $videoPath = $validated['video_url'];
         }
@@ -280,8 +290,8 @@ class ListingController extends Controller
         $keptImages = array_values(array_diff($existingImages, $removeImages));
 
         foreach ($removeImages as $path) {
-            if ($path !== '') {
-                Storage::disk('public')->delete($path);
+            if ($path !== '' && file_exists(public_path($path))) {
+                unlink(public_path($path));
             }
         }
 
@@ -293,9 +303,15 @@ class ListingController extends Controller
                 $images = array_slice($images, 0, 1);
             }
 
+            // Ensure directory exists
+            if (!file_exists(public_path('uploads/listings'))) {
+                mkdir(public_path('uploads/listings'), 0755, true);
+            }
+
             foreach ($images as $image) {
-                $path = $image->store('listings', 'public');
-                $newImagePaths[] = $path;
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/listings'), $filename);
+                $newImagePaths[] = 'uploads/listings/' . $filename;
             }
         }
 
@@ -317,24 +333,24 @@ class ListingController extends Controller
 
             $existingVideo = (string) ($listing->video_path ?? '');
             if ($removeVideo) {
-                if (str_starts_with($existingVideo, '/storage/')) {
-                    $relative = ltrim(str_replace('/storage/', '', $existingVideo), '/');
-                    if ($relative !== '') {
-                        Storage::disk('public')->delete($relative);
-                    }
+                if ($existingVideo !== '' && file_exists(public_path($existingVideo))) {
+                    unlink(public_path($existingVideo));
                 }
 
                 $videoPath = null;
             } elseif ($request->hasFile('video_file')) {
-                if (str_starts_with($existingVideo, '/storage/')) {
-                    $relative = ltrim(str_replace('/storage/', '', $existingVideo), '/');
-                    if ($relative !== '') {
-                        Storage::disk('public')->delete($relative);
-                    }
+                if ($existingVideo !== '' && file_exists(public_path($existingVideo))) {
+                    unlink(public_path($existingVideo));
                 }
 
-                $path = $request->file('video_file')->store('listings/videos', 'public');
-                $videoPath = $path;
+                // Ensure directory exists
+                if (!file_exists(public_path('uploads/videos'))) {
+                    mkdir(public_path('uploads/videos'), 0755, true);
+                }
+                $videoFile = $request->file('video_file');
+                $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
+                $videoFile->move(public_path('uploads/videos'), $filename);
+                $videoPath = 'uploads/videos/' . $filename;
             } elseif (!empty($validated['video_url'])) {
                 $videoPath = $validated['video_url'];
             } else {
