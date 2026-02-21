@@ -11,9 +11,10 @@ class SettingsSeeder extends Seeder
     {
         Setting::setValue('app_url', env('APP_URL'));
 
-        Setting::setValue('mail_scheme', env('MAIL_SCHEME'));
+        Setting::setValue('mail_scheme', null);
         Setting::setValue('mail_host', env('MAIL_HOST'));
         Setting::setValue('mail_port', (string) env('MAIL_PORT'));
+        Setting::setValue('mail_encryption', env('MAIL_ENCRYPTION'));
         Setting::setValue('mail_username', env('MAIL_USERNAME'));
         Setting::setValue('mail_password', env('MAIL_PASSWORD'));
         Setting::setValue('mail_from_address', env('MAIL_FROM_ADDRESS'));
