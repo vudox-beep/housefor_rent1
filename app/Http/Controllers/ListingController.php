@@ -166,14 +166,14 @@ class ListingController extends Controller
                 // Store in 'public/listings' directory
                 $path = $image->store('listings', 'public');
                 // Create a full URL or relative path that can be used with asset() or storage link
-                $imagePaths[] = '/storage/' . $path;
+                $imagePaths[] = $path;
             }
         }
 
         $videoPath = null;
         if ($canUploadVideo && $request->hasFile('video_file')) {
             $path = $request->file('video_file')->store('listings/videos', 'public');
-            $videoPath = '/storage/' . $path;
+            $videoPath = $path;
         } elseif ($canUploadVideo && !empty($validated['video_url'])) {
             $videoPath = $validated['video_url'];
         }
@@ -280,9 +280,8 @@ class ListingController extends Controller
         $keptImages = array_values(array_diff($existingImages, $removeImages));
 
         foreach ($removeImages as $path) {
-            $relative = ltrim(str_replace('/storage/', '', (string) $path), '/');
-            if ($relative !== '') {
-                Storage::disk('public')->delete($relative);
+            if ($path !== '') {
+                Storage::disk('public')->delete($path);
             }
         }
 
@@ -296,7 +295,7 @@ class ListingController extends Controller
 
             foreach ($images as $image) {
                 $path = $image->store('listings', 'public');
-                $newImagePaths[] = '/storage/' . $path;
+                $newImagePaths[] = $path;
             }
         }
 
@@ -335,7 +334,7 @@ class ListingController extends Controller
                 }
 
                 $path = $request->file('video_file')->store('listings/videos', 'public');
-                $videoPath = '/storage/' . $path;
+                $videoPath = $path;
             } elseif (!empty($validated['video_url'])) {
                 $videoPath = $validated['video_url'];
             } else {

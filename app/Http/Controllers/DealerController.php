@@ -169,7 +169,7 @@ class DealerController extends Controller
             'name' => $validated['name'],
             'phone' => $validated['phone'],
             'email' => $validated['email'],
-            'photo_path' => $photoPath ? '/storage/' . $photoPath : null,
+            'photo_path' => $photoPath ? $photoPath : null,
         ]);
 
         return back()->with('success', 'Agent added successfully.');
@@ -213,7 +213,7 @@ class DealerController extends Controller
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = '/storage/' . $path;
+            $user->avatar = $path;
         }
 
         $user->name = $validated['name'];
