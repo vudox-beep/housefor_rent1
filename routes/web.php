@@ -33,12 +33,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::resource('listings', ListingController::class)->only(['index', 'show']);
-Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // Listing routes that require authentication
     Route::resource('listings', ListingController::class)->except(['index', 'show']);
 });
+
+// Public Listing routes (must be after auth routes to avoid route model binding conflicts)
+Route::resource('listings', ListingController::class)->only(['index', 'show']);
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:admin'])->group(function () {
