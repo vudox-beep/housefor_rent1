@@ -10,6 +10,7 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Payments\LencoPaymentController;
+use App\Http\Controllers\Debug\MailDebugController;
 
 Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
 Route::post('/reports', [ReportController::class, 'store'])->middleware('auth')->name('reports.store');
@@ -42,6 +43,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
     Route::post('/users/{id}/suspend', [AdminController::class, 'suspendUser'])->name('users.suspend');
     Route::post('/users/{id}/activate', [AdminController::class, 'activateUser'])->name('users.activate');
     Route::post('/listings/{listing}/status', [AdminController::class, 'updateListingStatus'])->name('listings.status');
+    Route::post('/debug/mail', [MailDebugController::class, 'send'])->name('debug.mail');
+    Route::get('/debug/config/{secret}', function ($secret) {
+        if ($secret !== 'vudo-secret-123') {
+            abort(403);
+        }
+        return response()->json([
+            'mail_driver' => config('mail.default'),
+            'smtp_host' => config('mail.mailers.smtp.host'),
+            'smtp_port' => config('mail.mailers.smtp.port'),
+            'smtp_encryption' => config('mail.mailers.smtp.encryption'),
+            'smtp_scheme' => config('mail.mailers.smtp.scheme'),
+            'smtp_username' => config('mail.mailers.smtp.username'),
+            'smtp_password' => config('mail.mailers.smtp.password') ? '***SET***' : 'MISSING',
+            'from_address' => config('mail.from.address'),
+            'app_url' => config('app.url'),
+            'google_client_id' => config('services.google.client_id') ? '***SET***' : 'MISSING',
+            'lenco_key' => config('services.lenco.key') ? '***SET***' : 'MISSING',
+        ]);
+    });
 });
 
 // Dealer Routes
