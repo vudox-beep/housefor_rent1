@@ -76,19 +76,19 @@
             @if(isset($listing->images) && count($listing->images) >= 3)
                 <div class="gallery-grid">
                     <div class="gallery-main photo-card">
-                        <img src="{{ $listing->images[0] }}" class="gallery-img">
+                        <img src="{{ asset('storage/' . $listing->images[0]) }}" class="gallery-img">
                     </div>
                     <div class="gallery-sub photo-card">
-                        <img src="{{ $listing->images[1] }}" class="gallery-img">
+                        <img src="{{ asset('storage/' . $listing->images[1]) }}" class="gallery-img">
                     </div>
                     <div class="gallery-sub photo-card">
-                            <img src="{{ $listing->images[2] }}" class="gallery-img">
+                            <img src="{{ asset('storage/' . $listing->images[2]) }}" class="gallery-img">
                         </div>
                     </div>
                 @else
                     <div class="gallery-grid" style="grid-template-columns: 1fr;">
                         <div class="gallery-main photo-card">
-                            <img src="{{ $galleryImages[0] }}" class="gallery-img">
+                            <img src="{{ asset('storage/' . $galleryImages[0]) }}" class="gallery-img">
                         </div>
                     </div>
                 @endif
@@ -96,7 +96,7 @@
                 <div class="gallery-carousel">
                     @foreach($galleryImages as $img)
                         <div class="gallery-carousel-item photo-card">
-                            <img src="{{ $img }}" class="gallery-carousel-img">
+                            <img src="{{ asset('storage/' . $img) }}" class="gallery-carousel-img">
                         </div>
                     @endforeach
                 </div>
