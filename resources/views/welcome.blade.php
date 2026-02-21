@@ -240,9 +240,7 @@
                         @foreach($recentListings as $listing)
                             <a href="{{ route('listings.show', $listing->public_id) }}" class="listing-card">
                                 <div class="listing-image-container">
-                                    @if(is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ $listing->images[0] }}" alt="{{ $listing->title }}" class="listing-image">
-                                    @elseif($listing->images)
+                                    @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
                                         <img src="{{ asset('storage/' . $listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image">
                                     @else
                                         <!-- Placeholder logic based on ID to show different images -->
