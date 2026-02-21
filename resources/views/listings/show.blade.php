@@ -76,19 +76,23 @@
             @if(isset($listing->images) && count($listing->images) >= 3)
                 <div class="gallery-grid">
                     <div class="gallery-main photo-card">
-                        <img src="{{ asset('storage/' . $listing->images[0]) }}" class="gallery-img">
+                        @php $imgUrl = asset(str_starts_with($listing->images[0], '/') ? $listing->images[0] : '/storage/' . ltrim($listing->images[0], '/')); @endphp
+                        <img src="{{ $imgUrl }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
                     </div>
                     <div class="gallery-sub photo-card">
-                        <img src="{{ asset('storage/' . $listing->images[1]) }}" class="gallery-img">
+                        @php $imgUrl = asset(str_starts_with($listing->images[1], '/') ? $listing->images[1] : '/storage/' . ltrim($listing->images[1], '/')); @endphp
+                        <img src="{{ $imgUrl }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop'">
                     </div>
                     <div class="gallery-sub photo-card">
-                            <img src="{{ asset('storage/' . $listing->images[2]) }}" class="gallery-img">
+                        @php $imgUrl = asset(str_starts_with($listing->images[2], '/') ? $listing->images[2] : '/storage/' . ltrim($listing->images[2], '/')); @endphp
+                        <img src="{{ $imgUrl }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop'">
                         </div>
                     </div>
                 @else
                     <div class="gallery-grid" style="grid-template-columns: 1fr;">
                         <div class="gallery-main photo-card">
-                            <img src="{{ asset('storage/' . $galleryImages[0]) }}" class="gallery-img">
+                            @php $imgUrl = asset(str_starts_with($galleryImages[0], '/') ? $galleryImages[0] : '/storage/' . ltrim($galleryImages[0], '/')); @endphp
+                            <img src="{{ $imgUrl }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
                         </div>
                     </div>
                 @endif
@@ -96,7 +100,8 @@
                 <div class="gallery-carousel">
                     @foreach($galleryImages as $img)
                         <div class="gallery-carousel-item photo-card">
-                            <img src="{{ asset('storage/' . $img) }}" class="gallery-carousel-img">
+                            @php $imgUrl = asset(str_starts_with($img, '/') ? $img : '/storage/' . ltrim($img, '/')); @endphp
+                            <img src="{{ $imgUrl }}" class="gallery-carousel-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
                         </div>
                     @endforeach
                 </div>

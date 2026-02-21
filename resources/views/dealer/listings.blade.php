@@ -30,7 +30,11 @@
                             <tr>
                                 <td style="width: 80px;">
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ asset('storage/' . $listing->images[0]) }}" alt="{{ $listing->title }}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                        @php
+                                            $imagePath = $listing->images[0];
+                                            $imageUrl = asset(str_starts_with($imagePath, '/') ? $imagePath : '/storage/' . ltrim($imagePath, '/'));
+                                        @endphp
+                                        <img src="{{ $imageUrl }}" alt="{{ $listing->title }}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">
                                     @else
                                         <div style="width: 60px; height: 40px; background-color: #eee; border-radius: 4px;"></div>
                                     @endif

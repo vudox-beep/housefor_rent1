@@ -241,7 +241,11 @@
                             <a href="{{ route('listings.show', $listing->public_id) }}" class="listing-card">
                                 <div class="listing-image-container">
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ asset('storage/' . $listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image">
+                                        @php
+                                            $imagePath = $listing->images[0];
+                                            $imageUrl = asset(str_starts_with($imagePath, '/') ? $imagePath : '/storage/' . ltrim($imagePath, '/'));
+                                        @endphp
+                                        <img src="{{ $imageUrl }}" alt="{{ $listing->title }}" class="listing-image" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
                                     @else
                                         <!-- Placeholder logic based on ID to show different images -->
                                         @php
