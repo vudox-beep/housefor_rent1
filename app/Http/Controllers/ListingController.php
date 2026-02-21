@@ -131,7 +131,7 @@ class ListingController extends Controller
             'previous_renters' => 'nullable|integer',
             'condition' => 'nullable|string',
             'images' => 'required|array|min:1|max:' . $maxImages,
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:6144',
             'video_url' => $canUploadVideo ? 'nullable|url' : 'nullable|string|in:',
             'video_file' => $canUploadVideo ? 'nullable|file|mimes:mp4,mov,webm|max:51200' : 'nullable',
             'agent_id' => 'nullable|exists:agents,id',
@@ -214,7 +214,7 @@ class ListingController extends Controller
 
     public function edit(Listing $listing)
     {
-        if ($listing->user_id !== auth()->id()) {
+        if ($listing->user_id !== Auth::id()) {
             abort(403);
         }
         return view('listings.edit', compact('listing'));
@@ -222,7 +222,7 @@ class ListingController extends Controller
 
     public function update(Request $request, Listing $listing)
     {
-        if ($listing->user_id !== auth()->id()) {
+        if ($listing->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -249,7 +249,7 @@ class ListingController extends Controller
             'previous_renters' => 'nullable|integer',
             'condition' => 'nullable|string',
             'images' => 'nullable|array|max:' . $maxImages,
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:6144',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'string',
             'remove_video' => 'nullable|boolean',
@@ -360,7 +360,7 @@ class ListingController extends Controller
 
     public function destroy(Listing $listing)
     {
-        if ($listing->user_id !== auth()->id()) {
+        if ($listing->user_id !== Auth::id()) {
             abort(403);
         }
 

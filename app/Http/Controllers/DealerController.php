@@ -156,7 +156,7 @@ class DealerController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|max:6144',
         ]);
 
         $photoPath = null;
@@ -208,7 +208,7 @@ class DealerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'avatar' => 'nullable|image|max:2048',
+            'avatar' => 'nullable|image|max:6144',
         ]);
 
         if ($request->hasFile('avatar')) {
