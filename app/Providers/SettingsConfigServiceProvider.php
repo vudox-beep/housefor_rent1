@@ -25,6 +25,7 @@ class SettingsConfigServiceProvider extends ServiceProvider
             }
 
             $mailSettings = [
+                'mail.default' => Setting::getValue('mail_mailer', 'smtp'),
                 'mail.mailers.smtp.scheme' => Setting::getValue('mail_scheme'),
                 'mail.mailers.smtp.host' => Setting::getValue('mail_host'),
                 'mail.mailers.smtp.port' => Setting::getValue('mail_port'),
@@ -67,7 +68,7 @@ class SettingsConfigServiceProvider extends ServiceProvider
             }
         } catch (\Throwable $e) {
             // Log error or silently fail to allow default config to work
-            // \Illuminate\Support\Facades\Log::error('SettingsConfigServiceProvider failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('SettingsConfigServiceProvider failed: ' . $e->getMessage());
         }
     }
 

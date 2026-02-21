@@ -10,7 +10,8 @@ class SettingsSeeder extends Seeder
     public function run(): void
     {
         Setting::setValue('app_url', env('APP_URL'));
-
+        
+        Setting::setValue('mail_mailer', env('MAIL_MAILER', 'smtp'));
         Setting::setValue('mail_scheme', null);
         Setting::setValue('mail_host', env('MAIL_HOST'));
         Setting::setValue('mail_port', (string) env('MAIL_PORT'));
