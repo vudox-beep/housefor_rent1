@@ -59,10 +59,10 @@
 }
 
 .hero-btn {
-    padding: 0.8rem 1.8rem;
+    padding: 0.6rem 1.4rem;
     border-radius: var(--radius-md);
-    font-weight: 700;
-    font-size: 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
     transition: all 0.2s ease;
 }
 
@@ -221,16 +221,19 @@
 @media (max-width: 576px) {
     .search-form {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 0.75rem;
     }
     
     .search-container {
-        padding: 1.25rem;
-        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        border-radius: 0; /* Flush edges */
+        box-shadow: none; /* Simplify for flat look or keep shadow if it overlaps */
+        border-left: none;
+        border-right: none;
     }
     
     .search-wrapper {
-        padding: 0 1rem; /* Touches the edges (bars) more closely */
+        padding: 0; /* Touches screen edges */
         margin-top: -40px;
     }
     
@@ -241,6 +244,7 @@
     .btn-search {
         width: 100%;
         justify-content: center;
+        padding: 0.8rem;
     }
 }
 
