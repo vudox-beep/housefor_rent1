@@ -25,6 +25,7 @@ class SettingsConfigServiceProvider extends ServiceProvider
         $mailScheme = Setting::getValue('mail_scheme', env('MAIL_SCHEME'));
         $mailHost = Setting::getValue('mail_host', env('MAIL_HOST', '127.0.0.1'));
         $mailPort = (int) (Setting::getValue('mail_port', (string) env('MAIL_PORT', 2525)));
+        $mailEncryption = Setting::getValue('mail_encryption', env('MAIL_ENCRYPTION'));
         $mailUsername = Setting::getValue('mail_username', env('MAIL_USERNAME'));
         $mailPassword = Setting::getValue('mail_password', env('MAIL_PASSWORD'));
         $mailFromAddress = Setting::getValue('mail_from_address', env('MAIL_FROM_ADDRESS'));
@@ -34,6 +35,7 @@ class SettingsConfigServiceProvider extends ServiceProvider
             'mail.mailers.smtp.scheme' => $mailScheme,
             'mail.mailers.smtp.host' => $mailHost,
             'mail.mailers.smtp.port' => $mailPort,
+            'mail.mailers.smtp.encryption' => $mailEncryption,
             'mail.mailers.smtp.username' => $mailUsername,
             'mail.mailers.smtp.password' => $mailPassword,
             'mail.from.address' => $mailFromAddress,
