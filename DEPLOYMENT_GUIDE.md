@@ -29,12 +29,14 @@ php artisan migrate
 This will update all existing image paths in your database.
 
 ### Step 2: Ensure Storage Symlink Exists
-Laravel Forge already creates the symlink during deployment, but verify it:
+The AppServiceProvider now automatically creates the storage symlink on first boot, but you can also run:
 ```bash
 php artisan storage:link
 ```
 
 This creates: `public/storage` → `storage/app/public`
+
+**Note**: The symlink is automatically created in `app/Providers/AppServiceProvider.php` boot() method, so manual creation is only needed if it fails.
 
 ### Step 3: Move Existing Images (If Needed)
 If you have existing images in `public/uploads/`, move them manually:
@@ -134,6 +136,7 @@ storage/app/public/
 
 ## Files Modified
 - `app/Http/Controllers/ListingController.php` - Storage path changes
+- `app/Providers/AppServiceProvider.php` - Auto symlink creation + directory initialization
 - `resources/views/listings/index.blade.php` - Fallback handling
 - `resources/views/listings/show.blade.php` - Gallery improvements
 - `resources/views/dealer/listings.blade.php` - Image display fix

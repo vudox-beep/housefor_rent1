@@ -67,8 +67,8 @@
                     </div>
                 </div>
 
-                <div class="hero-image-wrapper" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%); display: flex; align-items: center; justify-content: center; min-height: 400px; border-radius: 12px;">
-                    <svg width="100" height="100" fill="none" stroke="rgba(217, 119, 6, 0.3)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <div class="hero-image-wrapper" style="background: url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop') center/cover no-repeat, linear-gradient(135deg, rgba(217, 119, 6, 0.65) 0%, rgba(217, 119, 6, 0.5) 100%); background-blend-mode: overlay; display: flex; align-items: center; justify-content: center; min-height: 400px; border-radius: 12px;">
+                    <svg width="100" height="100" fill="none" stroke="white" viewBox="0 0 24 24" style="opacity: 0.9; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
 
                 <!-- Floating Search Bar -->
@@ -203,25 +203,25 @@
                 </div>
                 
                 <div class="category-grid">
-                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'family']) }}" class="category-card" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%); display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden;">
+                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'family']) }}" class="category-card" style="background: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop') center/cover no-repeat, linear-gradient(135deg, rgba(239, 68, 68, 0.7) 0%, rgba(239, 68, 68, 0.5) 100%); background-blend-mode: overlay; display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden; position: relative;" onmouseover="this.style.boxShadow='0 10px 30px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.boxShadow='none'" style="transition: all 0.3s ease;">
                         <div class="category-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                            <svg width="48" height="48" fill="none" stroke="rgba(217, 119, 6, 0.4)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                            <h3 class="category-title">Family House</h3>
-                            <p class="category-subtitle">Spacious homes for growing families</p>
+                            <svg width="56" height="56" fill="none" stroke="white" viewBox="0 0 24 24" style="margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l9-9 9 9M5 10v10a2 2 0 002 2h6a2 2 0 002-2v-10M9 15h6v4H9v-4z"></path></svg>
+                            <h3 class="category-title" style="color: white; font-size: 1.3rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Family House</h3>
+                            <p class="category-subtitle" style="color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.2);">Spacious homes for growing families</p>
                         </div>
                     </a>
-                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'single']) }}" class="category-card" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%); display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden;">
+                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'single']) }}" class="category-card" style="background: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=400&fit=crop') center/cover no-repeat, linear-gradient(135deg, rgba(59, 130, 246, 0.7) 0%, rgba(59, 130, 246, 0.5) 100%); background-blend-mode: overlay; display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden; position: relative;" onmouseover="this.style.boxShadow='0 10px 30px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.boxShadow='none'" style="transition: all 0.3s ease;">
                         <div class="category-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                            <svg width="48" height="48" fill="none" stroke="rgba(217, 119, 6, 0.4)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4l1 1h4l1-1h4a2 2 0 012 2v14a2 2 0 01-2 2z"></path></svg>
-                            <h3 class="category-title">Single Apartment</h3>
-                            <p class="category-subtitle">Modern spaces for individuals</p>
+                            <svg width="56" height="56" fill="none" stroke="white" viewBox="0 0 24 24" style="margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4l1 1h4l1-1h4a2 2 0 012 2v14a2 2 0 01-2 2z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 8h6M9 12h6M9 16h2"></path></svg>
+                            <h3 class="category-title" style="color: white; font-size: 1.3rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Single Apartment</h3>
+                            <p class="category-subtitle" style="color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.2);">Modern spaces for individuals</p>
                         </div>
                     </a>
-                    <a href="{{ route('listings.index', ['category' => 'restaurant']) }}" class="category-card" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%); display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden;">
+                    <a href="{{ route('listings.index', ['category' => 'restaurant']) }}" class="category-card" style="background: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=400&fit=crop') center/cover no-repeat, linear-gradient(135deg, rgba(16, 185, 129, 0.7) 0%, rgba(16, 185, 129, 0.5) 100%); background-blend-mode: overlay; display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden; position: relative;" onmouseover="this.style.boxShadow='0 10px 30px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.boxShadow='none'" style="transition: all 0.3s ease;">
                         <div class="category-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                            <svg width="48" height="48" fill="none" stroke="rgba(217, 119, 6, 0.4)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <h3 class="category-title">Restaurants</h3>
-                            <p class="category-subtitle">Commercial spaces for dining</p>
+                            <svg width="56" height="56" fill="none" stroke="white" viewBox="0 0 24 24" style="margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v2.5m-3.5 6l-1.77-1.77m7.54 0l1.77-1.77M6 14c-.553 0-1 .447-1 1v4c0 .553.447 1 1 1h12c.553 0 1-.447 1-1v-4c0-.553-.447-1-1-1H6zm3 0v-2c0-.553.447-1 1-1h2c.553 0 1 .447 1 1v2m-6 4v3m4 0v3m4 0v3"></path></svg>
+                            <h3 class="category-title" style="color: white; font-size: 1.3rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Restaurants</h3>
+                            <p class="category-subtitle" style="color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.2);">Commercial spaces for dining</p>
                         </div>
                     </a>
                 </div>
