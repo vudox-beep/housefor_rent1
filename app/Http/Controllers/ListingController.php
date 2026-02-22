@@ -473,23 +473,22 @@ class ListingController extends Controller
      */
     private function getStorageDisk()
     {
-        // Try to use Laravel Cloud 'uploads' disk
-        try {
-            // Check if 'uploads' disk is actually configured
-            $disks = config('filesystems.disks');
-            if (!isset($disks['uploads'])) {
-                Log::debug('uploads disk not configured, using public');
-                return 'public';
+        // FORCE Laravel Cloud 'uploads' disk for testing
+        // In production, Laravel Cloud will auto-configure this
+        // For local testing, we'll force it to use 'uploads' to test cloud functionality
+        
+        // Check if we're in a Laravel Cloud environment or want to force cloud
+        if (env('LARAVEL_CLOUD', false) || env('FORCE_CLOUD_STORAGE', false)) {
+            try {
+                // Try to use the 'uploads' disk (Laravel Cloud)
+                if (Storage::disk('uploads')->exists('.')) {
+                    return 'uploads';
+                }
+            } catch (\Exception $e) {
+                Log::debug('Cloud disk unavailable, falling back to public: ' . $e->getMessage());
             }
-            
-            // Try to access the disk - if it exists and is working, use it
-            if (Storage::disk('uploads')->exists('.')) {
-                return 'uploads';
-            }
-        } catch (\Exception $e) {
-            Log::debug('Cloud disk unavailable: ' . $e->getMessage());
         }
         
-        // Fallback to public local storage
+        // Fallback to public local storage for local development
         return 'public';
     }}
