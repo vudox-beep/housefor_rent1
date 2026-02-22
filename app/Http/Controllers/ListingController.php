@@ -482,8 +482,8 @@ class ListingController extends Controller
         // On production (Laravel Cloud), cloud storage MUST work
         if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
             try {
-                // Use the 'uploads' disk (Cloudflare R2/Laravel Cloud)
-                // Don't check existence - just use the disk directly
+                // Use the 'uploads' disk (Laravel Cloud Object Storage)
+                // Laravel Cloud automatically configures S3-compatible storage
                 return 'uploads';
             } catch (\Exception $e) {
                 // Production requires cloud storage - throw error if it fails
