@@ -6,6 +6,7 @@ use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ListingController extends Controller
 {
@@ -163,17 +164,66 @@ class ListingController extends Controller
             }
             
             foreach ($images as $image) {
-                // Store on S3 (Cloudflare R2)
-                $path = $image->store('properties', 's3');
-                $imagePaths[] = $path;
+                try {
+                    // Determine disk based on env configuration
+                    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+                    
+                    if ($disk === 's3') {
+                        // Verify S3 credentials exist
+                        if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
+                            Log::warning('S3 credentials not configured, falling back to local storage');
+                            $disk = 'public';
+                        }
+                    }
+                    
+                    // Store image
+                    if ($disk === 's3') {
+                        $path = $image->store('properties', 's3');
+                    } else {
+                        // Fallback to public storage
+                        $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                        $image->storeAs('listings', $filename, 'public');
+                        $path = 'storage/listings/' . $filename;
+                    }
+                    
+                    $imagePaths[] = $path;
+                } catch (\Exception $e) {
+                    Log::error('Image upload failed: ' . $e->getMessage());
+                    return back()->withErrors([
+                        'images' => 'Failed to upload image: ' . $e->getMessage()
+                    ])->withInput();
+                }
             }
         }
 
         $videoPath = null;
         if ($canUploadVideo && $request->hasFile('video_file')) {
-            $videoFile = $request->file('video_file');
-            $path = $videoFile->store('videos', 's3');
-            $videoPath = $path;
+            try {
+                $videoFile = $request->file('video_file');
+                $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+                
+                if ($disk === 's3') {
+                    if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
+                        Log::warning('S3 credentials not configured, falling back to local storage for video');
+                        $disk = 'public';
+                    }
+                }
+                
+                if ($disk === 's3') {
+                    $path = $videoFile->store('videos', 's3');
+                } else {
+                    $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
+                    $videoFile->storeAs('videos', $filename, 'public');
+                    $path = 'storage/videos/' . $filename;
+                }
+                
+                $videoPath = $path;
+            } catch (\Exception $e) {
+                Log::error('Video upload failed: ' . $e->getMessage());
+                return back()->withErrors([
+                    'video_file' => 'Failed to upload video: ' . $e->getMessage()
+                ])->withInput();
+            }
         } elseif ($canUploadVideo && !empty($validated['video_url'])) {
             $videoPath = $validated['video_url'];
         }
@@ -280,9 +330,21 @@ class ListingController extends Controller
         $keptImages = array_values(array_diff($existingImages, $removeImages));
 
         foreach ($removeImages as $path) {
-            // Delete from S3
-            if ($path !== '') {
-                Storage::disk('s3')->delete($path);
+            try {
+                if ($path !== '') {
+                    // Try S3 first if image path looks like S3 format
+                    if (strpos($path, 'properties/') === 0 || strpos($path, 'videos/') === 0) {
+                        Storage::disk('s3')->delete($path);
+                    } else {
+                        // Fallback to local storage for old paths
+                        $storagePath = str_replace('storage/', 'app/public/', $path);
+                        if (file_exists(storage_path($storagePath))) {
+                            unlink(storage_path($storagePath));
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to delete image: ' . $e->getMessage());
             }
         }
 
@@ -295,9 +357,31 @@ class ListingController extends Controller
             }
 
             foreach ($images as $image) {
-                // Store on S3 (Cloudflare R2)
-                $path = $image->store('properties', 's3');
-                $newImagePaths[] = $path;
+                try {
+                    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+                    
+                    if ($disk === 's3') {
+                        if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
+                            Log::warning('S3 credentials not configured in update');
+                            $disk = 'public';
+                        }
+                    }
+                    
+                    if ($disk === 's3') {
+                        $path = $image->store('properties', 's3');
+                    } else {
+                        $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                        $image->storeAs('listings', $filename, 'public');
+                        $path = 'storage/listings/' . $filename;
+                    }
+                    
+                    $newImagePaths[] = $path;
+                } catch (\Exception $e) {
+                    Log::error('Image upload failed in update: ' . $e->getMessage());
+                    return back()->withErrors([
+                        'images' => 'Failed to upload image: ' . $e->getMessage()
+                    ])->withInput();
+                }
             }
         }
 
@@ -319,19 +403,59 @@ class ListingController extends Controller
 
             $existingVideo = (string) ($listing->video_path ?? '');
             if ($removeVideo) {
-                if ($existingVideo !== '') {
-                    Storage::disk('s3')->delete($existingVideo);
+                try {
+                    if ($existingVideo !== '') {
+                        if (strpos($existingVideo, 'videos/') === 0) {
+                            Storage::disk('s3')->delete($existingVideo);
+                        } else {
+                            $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
+                            if (file_exists(storage_path($storagePath))) {
+                                unlink(storage_path($storagePath));
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Failed to delete video: ' . $e->getMessage());
                 }
 
                 $videoPath = null;
             } elseif ($request->hasFile('video_file')) {
-                if ($existingVideo !== '') {
-                    Storage::disk('s3')->delete($existingVideo);
-                }
+                try {
+                    if ($existingVideo !== '') {
+                        if (strpos($existingVideo, 'videos/') === 0) {
+                            Storage::disk('s3')->delete($existingVideo);
+                        } else {
+                            $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
+                            if (file_exists(storage_path($storagePath))) {
+                                unlink(storage_path($storagePath));
+                            }
+                        }
+                    }
 
-                $videoFile = $request->file('video_file');
-                $path = $videoFile->store('videos', 's3');
-                $videoPath = $path;
+                    $videoFile = $request->file('video_file');
+                    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+                    
+                    if ($disk === 's3') {
+                        if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
+                            $disk = 'public';
+                        }
+                    }
+                    
+                    if ($disk === 's3') {
+                        $path = $videoFile->store('videos', 's3');
+                    } else {
+                        $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
+                        $videoFile->storeAs('videos', $filename, 'public');
+                        $path = 'storage/videos/' . $filename;
+                    }
+                    
+                    $videoPath = $path;
+                } catch (\Exception $e) {
+                    Log::error('Video upload failed in update: ' . $e->getMessage());
+                    return back()->withErrors([
+                        'video_file' => 'Failed to upload video: ' . $e->getMessage()
+                    ])->withInput();
+                }
             } elseif (!empty($validated['video_url'])) {
                 $videoPath = $validated['video_url'];
             } else {
