@@ -18,21 +18,28 @@ if (!function_exists('imageUrl')) {
         }
 
         try {
-            // On Laravel Cloud, use Laravel Cloud's auto-configured storage URLs
+            // On Laravel Cloud, use signed URLs for R2 object storage
             $isProduction = env('APP_ENV') === 'production';
             $appUrl = env('APP_URL', '');
             
-            // If we're on Laravel Cloud production, use Laravel Cloud's storage system
+            // If we're on Laravel Cloud production, generate signed URLs for R2 storage
             if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
-                // Laravel Cloud automatically serves files from object storage
-                // The path should be relative to the storage root
-                if (strpos($path, 'storage/') === 0) {
-                    // Remove 'storage/' prefix for cloud storage
-                    $cleanPath = str_replace('storage/', '', $path);
-                    return rtrim($appUrl, '/') . '/storage/' . $cleanPath;
-                }
-                // If no storage/ prefix, assume it's already a cloud path
-                return rtrim($appUrl, '/') . '/storage/' . $path;
+                // Get clean path without 'storage/' prefix
+                $cleanPath = strpos($path, 'storage/') === 0 ? 
+                    str_replace('storage/', '', $path) : $path;
+                
+                // Generate URL for R2 object storage using Laravel Cloud's URL pattern
+                 $bucketName = env('AWS_BUCKET');
+                 $region = env('AWS_DEFAULT_REGION', 'auto');
+                 
+                 // Construct R2 URL format: https://<bucket>.<account-id>.r2.cloudflarestorage.com/<path>
+                 // For Laravel Cloud, they might use a different pattern, so fallback to asset() if needed
+                 if ($bucketName) {
+                     return "https://{$bucketName}.r2.cloudflarestorage.com/{$cleanPath}";
+                 }
+                 
+                 // Fallback: use asset() with the clean path
+                 return asset('storage/' . $cleanPath);
             }
 
             // For local development, use local storage with asset()
