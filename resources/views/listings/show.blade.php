@@ -66,37 +66,40 @@
             @php
                 $fallbackImg = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop';
                 $galleryImages = [];
+                $displayImages = [];
                 if (isset($listing->images) && is_array($listing->images) && count($listing->images) > 0) {
                     $galleryImages = $listing->images;
+                    $displayImages = array_map(function($img) { return asset($img); }, $listing->images);
                 } else {
                     $galleryImages = [$fallbackImg];
+                    $displayImages = [$fallbackImg];
                 }
             @endphp
 
-            @if(isset($listing->images) && count($listing->images) >= 3)
+            @if(isset($listing->images) && is_array($listing->images) && count($listing->images) >= 3)
                 <div class="gallery-grid">
                     <div class="gallery-main photo-card">
-                        <img src="{{ asset($listing->images[0]) }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
+                        <img src="{{ $displayImages[0] }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
                     </div>
                     <div class="gallery-sub photo-card">
-                        <img src="{{ asset($listing->images[1]) }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop'">
+                        <img src="{{ $displayImages[1] }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
                     </div>
                     <div class="gallery-sub photo-card">
-                        <img src="{{ asset($listing->images[2]) }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop'">
+                        <img src="{{ $displayImages[2] }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
                         </div>
                     </div>
                 @else
                     <div class="gallery-grid" style="grid-template-columns: 1fr;">
                         <div class="gallery-main photo-card">
-                            <img src="{{ asset($galleryImages[0]) }}" class="gallery-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
+                            <img src="{{ $displayImages[0] ?? $fallbackImg }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
                         </div>
                     </div>
                 @endif
 
                 <div class="gallery-carousel">
-                    @foreach($galleryImages as $img)
+                    @foreach($displayImages as $img)
                         <div class="gallery-carousel-item photo-card">
-                            <img src="{{ asset($img) }}" class="gallery-carousel-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
+                            <img src="{{ $img }}" class="gallery-carousel-img" onerror="this.src='{{ $fallbackImg }}'">
                         </div>
                     @endforeach
                 </div>

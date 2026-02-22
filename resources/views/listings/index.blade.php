@@ -192,16 +192,16 @@
                         @foreach($listings as $listing)
                             <a href="{{ route('listings.show', $listing->public_id) }}" class="listing-card">
                                 <div class="listing-image-container">
+                                    @php
+                                        $fallbackUrl = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop';
+                                        if($listing->id % 3 == 0) $fallbackUrl = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop';
+                                        if($listing->id % 3 == 1) $fallbackUrl = 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop';
+                                        if($listing->category == 'restaurant') $fallbackUrl = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop';
+                                    @endphp
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
+                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image" onerror="this.src='{{ $fallbackUrl }}'">
                                     @else
-                                        @php
-                                            $imgUrl = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop';
-                                            if($listing->id % 3 == 0) $imgUrl = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop';
-                                            if($listing->id % 3 == 1) $imgUrl = 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop';
-                                            if($listing->category == 'restaurant') $imgUrl = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop';
-                                        @endphp
-                                        <img src="{{ $imgUrl }}" alt="{{ $listing->title }}" class="listing-image">
+                                        <img src="{{ $fallbackUrl }}" alt="{{ $listing->title }}" class="listing-image">
                                     @endif
                                     
                                     <span class="listing-badge">

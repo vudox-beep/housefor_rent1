@@ -29,10 +29,13 @@
                         @foreach($listings as $listing)
                             <tr>
                                 <td style="width: 80px;">
+                                    @php
+                                        $fallbackImg = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop';
+                                    @endphp
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">
+                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;" onerror="this.src='{{ $fallbackImg }}'">
                                     @else
-                                        <div style="width: 60px; height: 40px; background-color: #eee; border-radius: 4px;"></div>
+                                        <img src="{{ $fallbackImg }}" alt="No image" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
                                     @endif
                                 </td>
                                 <td>
