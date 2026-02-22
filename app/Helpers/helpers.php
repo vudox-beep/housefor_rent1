@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 if (!function_exists('imageUrl')) {
     /**
-     * Get the URL for an image stored on any disk
-     * Supports Laravel Cloud Object Storage, S3, local storage, etc.
+     * Get the URL for an image stored on Laravel Cloud Object Storage or local disk
+     * Supports 'uploads' disk (Laravel Cloud), local storage, etc.
      * 
      * @param string $path
      * @return string
@@ -22,19 +23,22 @@ if (!function_exists('imageUrl')) {
                 return asset($path);
             }
 
-            // Otherwise it's a cloud disk path (Laravel Cloud, S3, etc.)
-            // Use the configured disk from FILESYSTEM_DISK env
-            $disk = env('FILESYSTEM_DISK', 'public');
-            
-            if ($disk !== 'local' && $disk !== 'public') {
-                return Storage::disk($disk)->url($path);
+            // Otherwise it's a cloud disk path (Laravel Cloud 'uploads' disk)
+            // Try the 'uploads' disk first (Laravel Cloud Object Storage)
+            try {
+                $url = Storage::disk('uploads')->url($path);
+                if ($url) {
+                    return $url;
+                }
+            } catch (\Exception $e) {
+                Log::debug('uploads disk not available: ' . $e->getMessage());
             }
             
-            // Fallback to asset
+            // Fallback to asset for local storage
             return asset($path);
         } catch (\Throwable $e) {
             // If any error occurs, fallback to asset path
-            \Illuminate\Support\Facades\Log::warning('imageUrl helper error: ' . $e->getMessage());
+            Log::warning('imageUrl helper error: ' . $e->getMessage());
             return asset($path);
         }
     }
