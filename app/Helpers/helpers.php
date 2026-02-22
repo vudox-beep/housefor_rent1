@@ -28,17 +28,20 @@ if (!function_exists('imageUrl')) {
                 $cleanPath = strpos($path, 'storage/') === 0 ? 
                     str_replace('storage/', '', $path) : $path;
                 
-                // Generate URL for R2 object storage using Laravel Cloud's URL pattern
+                // Generate public URL for R2 object storage (bucket is set to Public)
+                 // Since bucket is public, we can use direct URL construction
                  $bucketName = env('AWS_BUCKET');
-                 $region = env('AWS_DEFAULT_REGION', 'auto');
+                 $endpoint = env('AWS_ENDPOINT');
                  
-                 // Construct R2 URL format: https://<bucket>.<account-id>.r2.cloudflarestorage.com/<path>
-                 // For Laravel Cloud, they might use a different pattern, so fallback to asset() if needed
-                 if ($bucketName) {
+                 if ($bucketName && $endpoint) {
+                     // Use the endpoint URL directly for public bucket access
+                     return rtrim($endpoint, '/') . '/' . $cleanPath;
+                 } elseif ($bucketName) {
+                     // Fallback: construct R2 URL format
                      return "https://{$bucketName}.r2.cloudflarestorage.com/{$cleanPath}";
                  }
                  
-                 // Fallback: use asset() with the clean path
+                 // Final fallback: use asset() with the clean path
                  return asset('storage/' . $cleanPath);
             }
 
