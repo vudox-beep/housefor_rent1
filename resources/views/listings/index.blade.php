@@ -191,17 +191,11 @@
                     <div class="listings-grid">
                         @foreach($listings as $listing)
                             <a href="{{ route('listings.show', $listing->public_id) }}" class="listing-card">
-                                <div class="listing-image-container">
-                                    @php
-                                        $fallbackUrl = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop';
-                                        if($listing->id % 3 == 0) $fallbackUrl = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop';
-                                        if($listing->id % 3 == 1) $fallbackUrl = 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop';
-                                        if($listing->category == 'restaurant') $fallbackUrl = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop';
-                                    @endphp
+                                <div class="listing-image-container" style="background: var(--light-bg); display: flex; align-items: center; justify-content: center;">
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image" onerror="this.src='{{ $fallbackUrl }}'">
+                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image" style="width: 100%; height: 100%; object-fit: cover;">
                                     @else
-                                        <img src="{{ $fallbackUrl }}" alt="{{ $listing->title }}" class="listing-image">
+                                        <svg width="40" height="40" fill="none" stroke="var(--muted-text)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     @endif
                                     
                                     <span class="listing-badge">

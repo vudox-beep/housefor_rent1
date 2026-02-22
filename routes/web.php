@@ -91,10 +91,6 @@ Route::prefix('dealer')->name('dealer.')->middleware(['auth', 'verified', 'role:
 
 require __DIR__.'/auth.php';
 
-// Socialite / Google OAuth
-Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
-
 // Lenco payment routes
 Route::get('/payments/lenco/form', [LencoPaymentController::class, 'showPaymentForm'])->name('payments.lenco.form');
 Route::post('/payments/lenco/submit', [LencoPaymentController::class, 'submitPayment'])->name('payments.lenco.submit');

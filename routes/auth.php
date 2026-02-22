@@ -12,10 +12,12 @@ use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// Google OAuth callback - Must be outside guest middleware to accept creation
+Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 Route::middleware('guest')->group(function () {
-    // Google social login
+    // Google social login redirect
     Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
-    Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');

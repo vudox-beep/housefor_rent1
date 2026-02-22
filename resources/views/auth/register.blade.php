@@ -21,7 +21,7 @@
 
                 @if(\App\Models\Setting::getBool('free_trial_enabled', true))
                     <div style="margin-top: 1rem; background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.25); padding: 0.9rem 1rem; border-radius: 0.75rem; font-weight: 600;">
-                        Free Trial: Upload up to 20 photos and a video for 1 month (new accounts).
+                        ⏰ <strong>Free Trial Available:</strong> Dealers get 20 photos + 1 video per listing for 1 month free! After trial, basic accounts are limited to 1 image per listing.
                     </div>
                 @endif
             </div>
@@ -104,14 +104,39 @@
 
                     <div class="form-group">
                         <label>Register As</label>
-                        <select name="role" class="auth-select" required>
-                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-                            <option value="dealer" {{ old('role') == 'dealer' ? 'selected' : '' }}>Dealer</option>
+                        <select name="role" class="auth-select" required onchange="updateRoleInfo()">
+                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User - Browse & Contact</option>
+                            <option value="dealer" {{ old('role') == 'dealer' ? 'selected' : '' }}>Dealer - Post Listings</option>
                         </select>
                         @error('role')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
+                        <div id="role-info" style="margin-top: 1rem; padding: 1rem; background: rgba(217, 119, 6, 0.08); border-left: 4px solid rgba(217, 119, 6, 0.5); border-radius: 0.5rem; font-size: 0.9rem; color: var(--dark-text);">
+                            <p id="role-description"></p>
+                        </div>
                     </div>
+
+                    <script>
+                    function updateRoleInfo() {
+                        const select = document.querySelector('select[name="role"]');
+                        const roleInfo = document.getElementById('role-description');
+                        
+                        if (select.value === 'dealer') {
+                            roleInfo.innerHTML = `<strong>🏠 Dealer Account</strong><br/>
+                                ✓ Free Trial: 20 images + 1 video for 1 month<br/>
+                                ✓ After Trial: 1 image per listing (upgrade to Gold for unlimited)<br/>
+                                ✓ Gold Plan: 5 images + videos per listing<br/>
+                                ✓ Manage agents & track leads`;
+                        } else {
+                            roleInfo.innerHTML = `<strong>👤 User Account</strong><br/>
+                                ✓ Browse all property listings<br/>
+                                ✓ Save favorite properties<br/>
+                                ✓ Contact dealers & agents<br/>
+                                ✓ No listing restrictions`;
+                        }
+                    }
+                    document.addEventListener('DOMContentLoaded', updateRoleInfo);
+                    </script>
 
                     <div class="form-group">
                         <label>Favorite Color</label>

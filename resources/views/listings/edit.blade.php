@@ -3,6 +3,30 @@
 @section('title', 'Edit Listing')
 
 @section('content')
+    @php
+        $isBasic = !Auth::user()->isGold() && !Auth::user()->hasActiveTrial();
+        $isGold = Auth::user()->isGold();
+        $isTrial = Auth::user()->hasActiveTrial();
+    @endphp
+
+    @if($isBasic)
+        <div style="margin-bottom: 1.5rem; background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); color: #B91C1C; padding: 1rem; border-radius: var(--radius-md); font-weight: 600;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2v2m0-4h-2V7h2v6z"/></svg>
+                <span>Basic Account - Limited to 1 Image Per Listing</span>
+            </div>
+            <p style="margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 500;">Upgrade to Gold for unlimited images + video uploads</p>
+            <a href="{{ route('dealer.subscription') }}" style="display: inline-block; background: #DC2626; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                Upgrade Now
+            </a>
+        </div>
+    @elseif($isTrial)
+        <div style="margin-bottom: 1.5rem; background: rgba(217, 119, 6, 0.12); border: 2px solid rgba(217, 119, 6, 0.3); color: var(--dark-text); padding: 1rem; border-radius: var(--radius-md); font-weight: 600;">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 0.5rem;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5m-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11m3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+            Free Trial Account - Upload up to 20 images + 1 video per listing
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Edit Property Details</h3>

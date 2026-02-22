@@ -60,21 +60,15 @@
                     <span class="hero-label">Your Trusted Partner</span>
                     <h1 class="hero-title">Find Your Dream Home with <span>Professional Care</span></h1>
                     <p class="hero-subtitle">Whether you're looking to buy, rent, or sell, we provide a seamless experience with expert guidance at every step.</p>
-
-                    @if(\App\Models\Setting::getBool('free_trial_enabled', true))
-                        <div style="margin-top: 1rem; background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.25); color: var(--dark-text); padding: 0.9rem 1rem; border-radius: 0.75rem; font-weight: 600;">
-                            Free Trial: New accounts can upload up to 20 photos and a video for 1 month.
-                        </div>
-                    @endif
                     
-                    <div class="hero-buttons">
+                    <div class="hero-buttons" style="margin-top: 2rem;">
                         <a href="{{ route('listings.index') }}" class="hero-btn primary">View Listings</a>
                         <a href="#" class="hero-btn secondary">Get an Appraisal</a>
                     </div>
                 </div>
 
-                <div class="hero-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop" alt="Modern Interior" class="hero-image">
+                <div class="hero-image-wrapper" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%); display: flex; align-items: center; justify-content: center; min-height: 400px; border-radius: 12px;">
+                    <svg width="100" height="100" fill="none" stroke="rgba(217, 119, 6, 0.3)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
 
                 <!-- Floating Search Bar -->
@@ -196,23 +190,23 @@
                 </div>
                 
                 <div class="category-grid">
-                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'family']) }}" class="category-card">
-                        <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=1000&auto=format&fit=crop" alt="Family House" class="category-img">
-                        <div class="category-overlay">
+                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'family']) }}" class="category-card" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%); display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden;">
+                        <div class="category-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                            <svg width="48" height="48" fill="none" stroke="rgba(217, 119, 6, 0.4)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                             <h3 class="category-title">Family House</h3>
                             <p class="category-subtitle">Spacious homes for growing families</p>
                         </div>
                     </a>
-                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'single']) }}" class="category-card">
-                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1000&auto=format&fit=crop" alt="Single Apartment" class="category-img">
-                        <div class="category-overlay">
+                    <a href="{{ route('listings.index', ['category' => 'house', 'search' => 'single']) }}" class="category-card" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%); display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden;">
+                        <div class="category-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                            <svg width="48" height="48" fill="none" stroke="rgba(217, 119, 6, 0.4)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4l1 1h4l1-1h4a2 2 0 012 2v14a2 2 0 01-2 2z"></path></svg>
                             <h3 class="category-title">Single Apartment</h3>
                             <p class="category-subtitle">Modern spaces for individuals</p>
                         </div>
                     </a>
-                    <a href="{{ route('listings.index', ['category' => 'restaurant']) }}" class="category-card">
-                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop" alt="Restaurants" class="category-img">
-                        <div class="category-overlay">
+                    <a href="{{ route('listings.index', ['category' => 'restaurant']) }}" class="category-card" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%); display: flex; align-items: center; justify-content: center; min-height: 250px; border-radius: 12px; overflow: hidden;">
+                        <div class="category-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                            <svg width="48" height="48" fill="none" stroke="rgba(217, 119, 6, 0.4)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <h3 class="category-title">Restaurants</h3>
                             <p class="category-subtitle">Commercial spaces for dining</p>
                         </div>
@@ -239,21 +233,11 @@
                     <div class="listings-grid">
                         @foreach($recentListings as $listing)
                             <a href="{{ route('listings.show', $listing->public_id) }}" class="listing-card">
-                                <div class="listing-image-container">
+                                <div class="listing-image-container" style="background: var(--light-bg); display: flex; align-items: center; justify-content: center;">
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        @php
-                                            $imagePath = $listing->images[0];
-                                            $imageUrl = asset($imagePath);
-                                        @endphp
-                                        <img src="{{ $imageUrl }}" alt="{{ $listing->title }}" class="listing-image" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop'">
+                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image" style="width: 100%; height: 100%; object-fit: cover;">
                                     @else
-                                        <!-- Placeholder logic based on ID to show different images -->
-                                        @php
-                                            $imgUrl = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop';
-                                            if($listing->id % 3 == 0) $imgUrl = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop';
-                                            if($listing->id % 3 == 1) $imgUrl = 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop';
-                                        @endphp
-                                        <img src="{{ $imgUrl }}" alt="{{ $listing->title }}" class="listing-image">
+                                        <svg width="40" height="40" fill="none" stroke="var(--muted-text)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     @endif
                                     
                                     <span class="listing-badge">

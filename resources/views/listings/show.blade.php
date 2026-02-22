@@ -64,45 +64,44 @@
 
             <!-- Gallery -->
             @php
-                $fallbackImg = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop';
-                $galleryImages = [];
-                $displayImages = [];
                 if (isset($listing->images) && is_array($listing->images) && count($listing->images) > 0) {
-                    $galleryImages = $listing->images;
                     $displayImages = array_map(function($img) { return asset($img); }, $listing->images);
                 } else {
-                    $galleryImages = [$fallbackImg];
-                    $displayImages = [$fallbackImg];
+                    $displayImages = [];
                 }
             @endphp
 
             @if(isset($listing->images) && is_array($listing->images) && count($listing->images) >= 3)
                 <div class="gallery-grid">
                     <div class="gallery-main photo-card">
-                        <img src="{{ $displayImages[0] }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
+                        <img src="{{ $displayImages[0] }}" class="gallery-img" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div class="gallery-sub photo-card">
-                        <img src="{{ $displayImages[1] }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
+                        <img src="{{ $displayImages[1] }}" class="gallery-img" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div class="gallery-sub photo-card">
-                        <img src="{{ $displayImages[2] }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
-                        </div>
+                        <img src="{{ $displayImages[2] }}" class="gallery-img" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
-                @else
-                    <div class="gallery-grid" style="grid-template-columns: 1fr;">
-                        <div class="gallery-main photo-card">
-                            <img src="{{ $displayImages[0] ?? $fallbackImg }}" class="gallery-img" onerror="this.src='{{ $fallbackImg }}'">
-                        </div>
-                    </div>
-                @endif
-
-                <div class="gallery-carousel">
-                    @foreach($displayImages as $img)
-                        <div class="gallery-carousel-item photo-card">
-                            <img src="{{ $img }}" class="gallery-carousel-img" onerror="this.src='{{ $fallbackImg }}'">
-                        </div>
-                    @endforeach
                 </div>
+            @elseif(isset($listing->images) && is_array($listing->images) && count($listing->images) > 0)
+                <div class="gallery-grid" style="grid-template-columns: 1fr;">
+                    <div class="gallery-main photo-card">
+                        <img src="{{ $displayImages[0] ?? '' }}" class="gallery-img" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+            @else
+                <div class="gallery-grid" style="grid-template-columns: 1fr; min-height: 400px; background: var(--light-bg); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md);">
+                    <svg width="80" height="80" fill="none" stroke="var(--muted-text)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+            @endif
+
+            <div class="gallery-carousel">
+                @foreach($displayImages as $img)
+                    <div class="gallery-carousel-item photo-card">
+                        <img src="{{ $img }}" class="gallery-carousel-img" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                @endforeach
+            </div>
 
                 <!-- Video Section (Gold Feature) -->
                 @if($listing->video_path)
