@@ -473,40 +473,38 @@ class ListingController extends Controller
      */
     private function getStorageDisk()
     {
-        // ALWAYS try to use cloud storage first (Cloudflare R2/Laravel Cloud)
-        // This ensures images persist and don't disappear
+        // NEVER use local storage - always use cloud storage (Cloudflare R2/Laravel Cloud)
+        // This ensures images persist and never disappear
         
-        // Check if we have cloud storage configured
-        $cloudConfigured = env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') && env('AWS_BUCKET');
         $isProduction = env('APP_ENV') === 'production';
         $appUrl = env('APP_URL', '');
         
-        // Use cloud storage if:
-        // 1. We have cloud credentials configured OR
-        // 2. We're on Laravel Cloud production OR  
-        // 3. We're forcing cloud storage for testing
-        $shouldUseCloud = $cloudConfigured || 
-                         ($isProduction && str_contains($appUrl, '.laravel.cloud')) ||
-                         env('FORCE_CLOUD_STORAGE', false);
-        
-        if ($shouldUseCloud) {
+        // On production (Laravel Cloud), cloud storage MUST work
+        if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
             try {
-                // Try to use the 'uploads' disk (Cloudflare R2/Laravel Cloud)
-                // This will persist images and prevent them from disappearing
+                // Use the 'uploads' disk (Cloudflare R2/Laravel Cloud)
                 Storage::disk('uploads')->exists('.'); // Test connection
                 return 'uploads';
             } catch (\Exception $e) {
-                // Log the error but continue with local storage
-                Log::error('Cloud storage unavailable: ' . $e->getMessage());
-                
-                // If we're in production and cloud should work, throw exception
-                if ($isProduction) {
-                    throw new \Exception('Cloud storage configuration error: ' . $e->getMessage());
-                }
+                // Production requires cloud storage - throw error if it fails
+                throw new \Exception('Cloud storage required for production: ' . $e->getMessage());
             }
         }
         
-        // Fallback to public local storage only for local development
-        // This ensures production always uses cloud storage for persistence
-        return 'public';
+        // For local development, still prefer cloud storage if configured
+        $cloudConfigured = env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') && env('AWS_BUCKET');
+        
+        if ($cloudConfigured || env('FORCE_CLOUD_STORAGE', false)) {
+            try {
+                // Use the 'uploads' disk (Cloudflare R2)
+                Storage::disk('uploads')->exists('.'); // Test connection
+                return 'uploads';
+            } catch (\Exception $e) {
+                // If cloud fails locally, throw error instead of using local storage
+                throw new \Exception('Cloud storage configuration required: ' . $e->getMessage());
+            }
+        }
+        
+        // NEVER fall back to local storage - require cloud configuration
+        throw new \Exception('Cloud storage not configured. Please set up Cloudflare R2/Laravel Cloud storage.');
     }}
