@@ -477,8 +477,15 @@ class ListingController extends Controller
         // In production, Laravel Cloud will auto-configure this
         // For local testing, we'll force it to use 'uploads' to test cloud functionality
         
-        // Check if we're in a Laravel Cloud environment or want to force cloud
-        if (env('LARAVEL_CLOUD', false) || env('FORCE_CLOUD_STORAGE', false)) {
+        // Check if we're actually on Laravel Cloud (not just local with cloud URL)
+        // Use more reliable cloud environment detection
+        $isProduction = env('APP_ENV') === 'production';
+        $appUrl = env('APP_URL', '');
+        $isActuallyOnCloud = ($isProduction && str_contains($appUrl, '.laravel.cloud')) || 
+                           env('LARAVEL_CLOUD', false) || 
+                           env('FORCE_CLOUD_STORAGE', false);
+        
+        if ($isActuallyOnCloud) {
             try {
                 // Try to use the 'uploads' disk (Laravel Cloud)
                 if (Storage::disk('uploads')->exists('.')) {
