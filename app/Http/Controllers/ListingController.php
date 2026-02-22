@@ -483,7 +483,7 @@ class ListingController extends Controller
         if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
             try {
                 // Use the 'uploads' disk (Cloudflare R2/Laravel Cloud)
-                Storage::disk('uploads')->exists('.'); // Test connection
+                // Don't check existence - just use the disk directly
                 return 'uploads';
             } catch (\Exception $e) {
                 // Production requires cloud storage - throw error if it fails
@@ -497,7 +497,7 @@ class ListingController extends Controller
         if ($cloudConfigured || env('FORCE_CLOUD_STORAGE', false)) {
             try {
                 // Use the 'uploads' disk (Cloudflare R2)
-                Storage::disk('uploads')->exists('.'); // Test connection
+                // Don't check existence - just use the disk directly
                 return 'uploads';
             } catch (\Exception $e) {
                 // If cloud fails locally, throw error instead of using local storage
