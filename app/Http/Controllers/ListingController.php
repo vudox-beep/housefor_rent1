@@ -473,29 +473,40 @@ class ListingController extends Controller
      */
     private function getStorageDisk()
     {
-        // FORCE Laravel Cloud 'uploads' disk for testing
-        // In production, Laravel Cloud will auto-configure this
-        // For local testing, we'll force it to use 'uploads' to test cloud functionality
+        // ALWAYS try to use cloud storage first (Cloudflare R2/Laravel Cloud)
+        // This ensures images persist and don't disappear
         
-        // Check if we're actually on Laravel Cloud (not just local with cloud URL)
-        // Use more reliable cloud environment detection
+        // Check if we have cloud storage configured
+        $cloudConfigured = env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') && env('AWS_BUCKET');
         $isProduction = env('APP_ENV') === 'production';
         $appUrl = env('APP_URL', '');
-        $isActuallyOnCloud = ($isProduction && str_contains($appUrl, '.laravel.cloud')) || 
-                           env('LARAVEL_CLOUD', false) || 
-                           env('FORCE_CLOUD_STORAGE', false);
         
-        if ($isActuallyOnCloud) {
+        // Use cloud storage if:
+        // 1. We have cloud credentials configured OR
+        // 2. We're on Laravel Cloud production OR  
+        // 3. We're forcing cloud storage for testing
+        $shouldUseCloud = $cloudConfigured || 
+                         ($isProduction && str_contains($appUrl, '.laravel.cloud')) ||
+                         env('FORCE_CLOUD_STORAGE', false);
+        
+        if ($shouldUseCloud) {
             try {
-                // Try to use the 'uploads' disk (Laravel Cloud)
-                if (Storage::disk('uploads')->exists('.')) {
-                    return 'uploads';
-                }
+                // Try to use the 'uploads' disk (Cloudflare R2/Laravel Cloud)
+                // This will persist images and prevent them from disappearing
+                Storage::disk('uploads')->exists('.'); // Test connection
+                return 'uploads';
             } catch (\Exception $e) {
-                Log::debug('Cloud disk unavailable, falling back to public: ' . $e->getMessage());
+                // Log the error but continue with local storage
+                Log::error('Cloud storage unavailable: ' . $e->getMessage());
+                
+                // If we're in production and cloud should work, throw exception
+                if ($isProduction) {
+                    throw new \Exception('Cloud storage configuration error: ' . $e->getMessage());
+                }
             }
         }
         
-        // Fallback to public local storage for local development
+        // Fallback to public local storage only for local development
+        // This ensures production always uses cloud storage for persistence
         return 'public';
     }}
