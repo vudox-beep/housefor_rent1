@@ -165,17 +165,14 @@ class ListingController extends Controller
             
             foreach ($images as $image) {
                 try {
-                    // Determine disk based on env configuration
                     $disk = $this->getStorageDisk();
                     
-                    // Store image
-                    if (in_array($disk, ['s3', 'r2'])) {
-                        $path = $image->store('properties', $disk);
-                    } else {
-                        // Fallback to public storage
-                        $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                        $image->storeAs('listings', $filename, 'public');
-                        $path = 'storage/listings/' . $filename;
+                    // Store image on configured disk (Laravel Cloud or local)
+                    $path = $image->store('properties', $disk);
+                    
+                    // For local disk, prefix with 'storage/' for asset() compatibility
+                    if ($disk === 'public') {
+                        $path = 'storage/' . $path;
                     }
                     
                     $imagePaths[] = $path;
@@ -194,12 +191,12 @@ class ListingController extends Controller
                 $videoFile = $request->file('video_file');
                 $disk = $this->getStorageDisk();
                 
-                if (in_array($disk, ['s3', 'r2'])) {
-                    $path = $videoFile->store('videos', $disk);
-                } else {
-                    $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
-                    $videoFile->storeAs('videos', $filename, 'public');
-                    $path = 'storage/videos/' . $filename;
+                // Store video on configured disk
+                $path = $videoFile->store('videos', $disk);
+                
+                // For local disk, prefix with 'storage/' for asset() compatibility
+                if ($disk === 'public') {
+                    $path = 'storage/' . $path;
                 }
                 
                 $videoPath = $path;
@@ -317,19 +314,12 @@ class ListingController extends Controller
         foreach ($removeImages as $path) {
             try {
                 if ($path !== '') {
-                    // Try cloud storage first if image path looks like cloud format
-                    if (strpos($path, 'properties/') === 0 || strpos($path, 'videos/') === 0) {
+                    // Check if it's a cloud storage path (doesn't start with 'storage/')
+                    if (strpos($path, 'storage/') !== 0) {
                         $disk = $this->getStorageDisk();
-                        if (in_array($disk, ['s3', 'r2'])) {
-                            Storage::disk($disk)->delete($path);
-                        } else {
-                            $storagePath = str_replace('storage/', 'app/public/', $path);
-                            if (file_exists(storage_path($storagePath))) {
-                                unlink(storage_path($storagePath));
-                            }
-                        }
+                        Storage::disk($disk)->delete($path);
                     } else {
-                        // Fallback to local storage for old paths
+                        // Local storage path
                         $storagePath = str_replace('storage/', 'app/public/', $path);
                         if (file_exists(storage_path($storagePath))) {
                             unlink(storage_path($storagePath));
@@ -353,12 +343,12 @@ class ListingController extends Controller
                 try {
                     $disk = $this->getStorageDisk();
                     
-                    if (in_array($disk, ['s3', 'r2'])) {
-                        $path = $image->store('properties', $disk);
-                    } else {
-                        $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                        $image->storeAs('listings', $filename, 'public');
-                        $path = 'storage/listings/' . $filename;
+                    // Store image on configured disk
+                    $path = $image->store('properties', $disk);
+                    
+                    // For local disk, prefix with 'storage/' for asset() compatibility
+                    if ($disk === 'public') {
+                        $path = 'storage/' . $path;
                     }
                     
                     $newImagePaths[] = $path;
@@ -391,16 +381,10 @@ class ListingController extends Controller
             if ($removeVideo) {
                 try {
                     if ($existingVideo !== '') {
-                        if (strpos($existingVideo, 'videos/') === 0) {
+                        // Check if it's a cloud storage path
+                        if (strpos($existingVideo, 'storage/') !== 0) {
                             $disk = $this->getStorageDisk();
-                            if (in_array($disk, ['s3', 'r2'])) {
-                                Storage::disk($disk)->delete($existingVideo);
-                            } else {
-                                $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
-                                if (file_exists(storage_path($storagePath))) {
-                                    unlink(storage_path($storagePath));
-                                }
-                            }
+                            Storage::disk($disk)->delete($existingVideo);
                         } else {
                             $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
                             if (file_exists(storage_path($storagePath))) {
@@ -416,16 +400,10 @@ class ListingController extends Controller
             } elseif ($request->hasFile('video_file')) {
                 try {
                     if ($existingVideo !== '') {
-                        if (strpos($existingVideo, 'videos/') === 0) {
+                        // Delete existing video
+                        if (strpos($existingVideo, 'storage/') !== 0) {
                             $disk = $this->getStorageDisk();
-                            if (in_array($disk, ['s3', 'r2'])) {
-                                Storage::disk($disk)->delete($existingVideo);
-                            } else {
-                                $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
-                                if (file_exists(storage_path($storagePath))) {
-                                    unlink(storage_path($storagePath));
-                                }
-                            }
+                            Storage::disk($disk)->delete($existingVideo);
                         } else {
                             $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
                             if (file_exists(storage_path($storagePath))) {
@@ -437,12 +415,11 @@ class ListingController extends Controller
                     $videoFile = $request->file('video_file');
                     $disk = $this->getStorageDisk();
                     
-                    if (in_array($disk, ['s3', 'r2'])) {
-                        $path = $videoFile->store('videos', $disk);
-                    } else {
-                        $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
-                        $videoFile->storeAs('videos', $filename, 'public');
-                        $path = 'storage/videos/' . $filename;
+                    $path = $videoFile->store('videos', $disk);
+                    
+                    // For local disk, prefix with 'storage/'
+                    if ($disk === 'public') {
+                        $path = 'storage/' . $path;
                     }
                     
                     $videoPath = $path;
@@ -491,20 +468,18 @@ class ListingController extends Controller
 
     /**
      * Determine which storage disk to use based on configuration
-     * Supports S3, R2 (Laravel Cloud), and local storage fallback
+     * For Laravel Cloud: uses the disk name you attached (e.g., 'r2')
+     * For local development: falls back to 'public' if cloud disk not available
      */
     private function getStorageDisk()
     {
-        $defaultDisk = config('filesystems.default');
+        $cloudDisk = env('FILESYSTEM_DISK', 'public');
         
-        // Check if default disk is s3-compatible and credentials are set
-        if (in_array($defaultDisk, ['s3', 'r2'])) {
-            if (env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY')) {
-                return $defaultDisk;
-            }
-            Log::warning('Cloud storage credentials not configured, falling back to local');
+        // If using Laravel Cloud Object Storage, use the configured disk
+        if ($cloudDisk !== 'local' && $cloudDisk !== 'public') {
+            return $cloudDisk;
         }
         
-        // Fallback to local storage
+        // Fallback to public local storage
         return 'public';
     }}
