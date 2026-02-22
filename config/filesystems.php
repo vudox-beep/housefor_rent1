@@ -52,17 +52,22 @@ return [
         // Just reference the disk name you selected in the Infrastructure Canvas
         // Example: if you named it 'r2' or 'properties-storage'
 
-        // Laravel Cloud Object Storage - use explicit S3 configuration
-        // Laravel Cloud provides these environment variables automatically
+        // Laravel Cloud Object Storage - S3-compatible configuration
+        // Laravel Cloud automatically provides these environment variables:
+        // - LARAVEL_CLOUD_OBJECT_STORAGE_KEY (AWS_ACCESS_KEY_ID)
+        // - LARAVEL_CLOUD_OBJECT_STORAGE_SECRET (AWS_SECRET_ACCESS_KEY) 
+        // - LARAVEL_CLOUD_OBJECT_STORAGE_BUCKET (AWS_BUCKET)
+        // - LARAVEL_CLOUD_OBJECT_STORAGE_REGION (AWS_DEFAULT_REGION)
+        // - LARAVEL_CLOUD_OBJECT_STORAGE_ENDPOINT (AWS_ENDPOINT)
         'uploads' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'region' => env('AWS_DEFAULT_REGION', 'auto'),
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'use_path_style_endpoint' => true, // Required for S3-compatible services
             'visibility' => 'public',
             'throw' => false,
         ],
