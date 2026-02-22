@@ -30,7 +30,7 @@
                             <tr>
                                 <td style="width: 80px;">
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                        <img src="{{ imageUrl($listing->images[0]) }}" alt="{{ $listing->title }}" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
                                     @else
                                         <div style="width: 60px; height: 40px; background: var(--light-bg); border-radius: 4px;"></div>
                                     @endif

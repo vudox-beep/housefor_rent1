@@ -197,7 +197,7 @@
                         @foreach($images as $img)
                             <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; background: white;">
                                 <div style="aspect-ratio: 4 / 3; background: #f3f4f6;">
-                                    <img src="{{ asset($img) }}" alt="Listing image" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <img src="{{ imageUrl($img) }}" alt="Listing image" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
                                 <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem; font-size: 0.85rem; color: var(--muted-text);">
                                     <input type="checkbox" name="remove_images[]" value="{{ $img }}">

@@ -247,7 +247,7 @@
                             <a href="{{ route('listings.show', $listing->public_id) }}" class="listing-card">
                                 <div class="listing-image-container" style="background: var(--light-bg); display: flex; align-items: center; justify-content: center; min-height: 250px;">
                                     @if($listing->images && is_array($listing->images) && count($listing->images) > 0)
-                                        <img src="{{ asset($listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="{{ imageUrl($listing->images[0]) }}" alt="{{ $listing->title }}" class="listing-image" style="width: 100%; height: 100%; object-fit: cover;">
                                     @endif
                                     
                                     <span class="listing-badge">

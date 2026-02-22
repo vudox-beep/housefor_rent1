@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ListingController extends Controller
 {
@@ -161,29 +162,18 @@ class ListingController extends Controller
                 $images = array_slice($images, 0, 1);
             }
             
-            // Ensure directory exists in persistent storage
-            if (!file_exists(storage_path('app/public/listings'))) {
-                mkdir(storage_path('app/public/listings'), 0755, true);
-            }
-            
             foreach ($images as $image) {
-                // Store in persistent storage/app/public folder
-                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(storage_path('app/public/listings'), $filename);
-                $imagePaths[] = 'storage/listings/' . $filename;
+                // Store on S3 (Cloudflare R2)
+                $path = $image->store('properties', 's3');
+                $imagePaths[] = $path;
             }
         }
 
         $videoPath = null;
         if ($canUploadVideo && $request->hasFile('video_file')) {
-            // Ensure directory exists in persistent storage
-            if (!file_exists(storage_path('app/public/videos'))) {
-                mkdir(storage_path('app/public/videos'), 0755, true);
-            }
             $videoFile = $request->file('video_file');
-            $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
-            $videoFile->move(storage_path('app/public/videos'), $filename);
-            $videoPath = 'storage/videos/' . $filename;
+            $path = $videoFile->store('videos', 's3');
+            $videoPath = $path;
         } elseif ($canUploadVideo && !empty($validated['video_url'])) {
             $videoPath = $validated['video_url'];
         }
@@ -290,10 +280,9 @@ class ListingController extends Controller
         $keptImages = array_values(array_diff($existingImages, $removeImages));
 
         foreach ($removeImages as $path) {
-            // Convert storage path back to full path for deletion
-            $storagePath = str_replace('storage/', 'app/public/', $path);
-            if ($path !== '' && file_exists(storage_path($storagePath))) {
-                unlink(storage_path($storagePath));
+            // Delete from S3
+            if ($path !== '') {
+                Storage::disk('s3')->delete($path);
             }
         }
 
@@ -305,15 +294,10 @@ class ListingController extends Controller
                 $images = array_slice($images, 0, 1);
             }
 
-            // Ensure directory exists in persistent storage
-            if (!file_exists(storage_path('app/public/listings'))) {
-                mkdir(storage_path('app/public/listings'), 0755, true);
-            }
-
             foreach ($images as $image) {
-                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(storage_path('app/public/listings'), $filename);
-                $newImagePaths[] = 'storage/listings/' . $filename;
+                // Store on S3 (Cloudflare R2)
+                $path = $image->store('properties', 's3');
+                $newImagePaths[] = $path;
             }
         }
 
@@ -335,26 +319,19 @@ class ListingController extends Controller
 
             $existingVideo = (string) ($listing->video_path ?? '');
             if ($removeVideo) {
-                $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
-                if ($existingVideo !== '' && file_exists(storage_path($storagePath))) {
-                    unlink(storage_path($storagePath));
+                if ($existingVideo !== '') {
+                    Storage::disk('s3')->delete($existingVideo);
                 }
 
                 $videoPath = null;
             } elseif ($request->hasFile('video_file')) {
-                $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
-                if ($existingVideo !== '' && file_exists(storage_path($storagePath))) {
-                    unlink(storage_path($storagePath));
+                if ($existingVideo !== '') {
+                    Storage::disk('s3')->delete($existingVideo);
                 }
 
-                // Ensure directory exists in persistent storage
-                if (!file_exists(storage_path('app/public/videos'))) {
-                    mkdir(storage_path('app/public/videos'), 0755, true);
-                }
                 $videoFile = $request->file('video_file');
-                $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
-                $videoFile->move(storage_path('app/public/videos'), $filename);
-                $videoPath = 'storage/videos/' . $filename;
+                $path = $videoFile->store('videos', 's3');
+                $videoPath = $path;
             } elseif (!empty($validated['video_url'])) {
                 $videoPath = $validated['video_url'];
             } else {

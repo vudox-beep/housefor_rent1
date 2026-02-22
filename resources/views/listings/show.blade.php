@@ -65,7 +65,7 @@
             <!-- Gallery -->
             @php
                 if (isset($listing->images) && is_array($listing->images) && count($listing->images) > 0) {
-                    $displayImages = array_map(function($img) { return asset($img); }, $listing->images);
+                    $displayImages = array_map(function($img) { return imageUrl($img); }, $listing->images);
                 } else {
                     $displayImages = [];
                 }
