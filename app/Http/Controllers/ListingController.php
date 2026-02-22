@@ -166,19 +166,11 @@ class ListingController extends Controller
             foreach ($images as $image) {
                 try {
                     // Determine disk based on env configuration
-                    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
-                    
-                    if ($disk === 's3') {
-                        // Verify S3 credentials exist
-                        if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
-                            Log::warning('S3 credentials not configured, falling back to local storage');
-                            $disk = 'public';
-                        }
-                    }
+                    $disk = $this->getStorageDisk();
                     
                     // Store image
-                    if ($disk === 's3') {
-                        $path = $image->store('properties', 's3');
+                    if (in_array($disk, ['s3', 'r2'])) {
+                        $path = $image->store('properties', $disk);
                     } else {
                         // Fallback to public storage
                         $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -200,17 +192,10 @@ class ListingController extends Controller
         if ($canUploadVideo && $request->hasFile('video_file')) {
             try {
                 $videoFile = $request->file('video_file');
-                $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+                $disk = $this->getStorageDisk();
                 
-                if ($disk === 's3') {
-                    if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
-                        Log::warning('S3 credentials not configured, falling back to local storage for video');
-                        $disk = 'public';
-                    }
-                }
-                
-                if ($disk === 's3') {
-                    $path = $videoFile->store('videos', 's3');
+                if (in_array($disk, ['s3', 'r2'])) {
+                    $path = $videoFile->store('videos', $disk);
                 } else {
                     $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
                     $videoFile->storeAs('videos', $filename, 'public');
@@ -332,9 +317,17 @@ class ListingController extends Controller
         foreach ($removeImages as $path) {
             try {
                 if ($path !== '') {
-                    // Try S3 first if image path looks like S3 format
+                    // Try cloud storage first if image path looks like cloud format
                     if (strpos($path, 'properties/') === 0 || strpos($path, 'videos/') === 0) {
-                        Storage::disk('s3')->delete($path);
+                        $disk = $this->getStorageDisk();
+                        if (in_array($disk, ['s3', 'r2'])) {
+                            Storage::disk($disk)->delete($path);
+                        } else {
+                            $storagePath = str_replace('storage/', 'app/public/', $path);
+                            if (file_exists(storage_path($storagePath))) {
+                                unlink(storage_path($storagePath));
+                            }
+                        }
                     } else {
                         // Fallback to local storage for old paths
                         $storagePath = str_replace('storage/', 'app/public/', $path);
@@ -358,17 +351,10 @@ class ListingController extends Controller
 
             foreach ($images as $image) {
                 try {
-                    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+                    $disk = $this->getStorageDisk();
                     
-                    if ($disk === 's3') {
-                        if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
-                            Log::warning('S3 credentials not configured in update');
-                            $disk = 'public';
-                        }
-                    }
-                    
-                    if ($disk === 's3') {
-                        $path = $image->store('properties', 's3');
+                    if (in_array($disk, ['s3', 'r2'])) {
+                        $path = $image->store('properties', $disk);
                     } else {
                         $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                         $image->storeAs('listings', $filename, 'public');
@@ -406,7 +392,15 @@ class ListingController extends Controller
                 try {
                     if ($existingVideo !== '') {
                         if (strpos($existingVideo, 'videos/') === 0) {
-                            Storage::disk('s3')->delete($existingVideo);
+                            $disk = $this->getStorageDisk();
+                            if (in_array($disk, ['s3', 'r2'])) {
+                                Storage::disk($disk)->delete($existingVideo);
+                            } else {
+                                $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
+                                if (file_exists(storage_path($storagePath))) {
+                                    unlink(storage_path($storagePath));
+                                }
+                            }
                         } else {
                             $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
                             if (file_exists(storage_path($storagePath))) {
@@ -423,7 +417,15 @@ class ListingController extends Controller
                 try {
                     if ($existingVideo !== '') {
                         if (strpos($existingVideo, 'videos/') === 0) {
-                            Storage::disk('s3')->delete($existingVideo);
+                            $disk = $this->getStorageDisk();
+                            if (in_array($disk, ['s3', 'r2'])) {
+                                Storage::disk($disk)->delete($existingVideo);
+                            } else {
+                                $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
+                                if (file_exists(storage_path($storagePath))) {
+                                    unlink(storage_path($storagePath));
+                                }
+                            }
                         } else {
                             $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
                             if (file_exists(storage_path($storagePath))) {
@@ -433,16 +435,10 @@ class ListingController extends Controller
                     }
 
                     $videoFile = $request->file('video_file');
-                    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+                    $disk = $this->getStorageDisk();
                     
-                    if ($disk === 's3') {
-                        if (!env('AWS_ACCESS_KEY_ID') || !env('AWS_SECRET_ACCESS_KEY')) {
-                            $disk = 'public';
-                        }
-                    }
-                    
-                    if ($disk === 's3') {
-                        $path = $videoFile->store('videos', 's3');
+                    if (in_array($disk, ['s3', 'r2'])) {
+                        $path = $videoFile->store('videos', $disk);
                     } else {
                         $filename = time() . '_' . uniqid() . '.' . $videoFile->getClientOriginalExtension();
                         $videoFile->storeAs('videos', $filename, 'public');
@@ -492,4 +488,23 @@ class ListingController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Listing deleted successfully.');
     }
-}
+
+    /**
+     * Determine which storage disk to use based on configuration
+     * Supports S3, R2 (Laravel Cloud), and local storage fallback
+     */
+    private function getStorageDisk()
+    {
+        $defaultDisk = config('filesystems.default');
+        
+        // Check if default disk is s3-compatible and credentials are set
+        if (in_array($defaultDisk, ['s3', 'r2'])) {
+            if (env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY')) {
+                return $defaultDisk;
+            }
+            Log::warning('Cloud storage credentials not configured, falling back to local');
+        }
+        
+        // Fallback to local storage
+        return 'public';
+    }}
