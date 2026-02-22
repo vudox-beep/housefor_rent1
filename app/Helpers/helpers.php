@@ -18,26 +18,24 @@ if (!function_exists('imageUrl')) {
         }
 
         try {
-            // If it's a local storage path (contains 'storage/' prefix)
-            if (strpos($path, 'storage/') === 0) {
-                return asset($path);
-            }
-
-            // On Laravel Cloud, use the direct URL construction for cloud storage
+            // On Laravel Cloud, use Laravel Cloud's auto-configured storage URLs
             $isProduction = env('APP_ENV') === 'production';
             $appUrl = env('APP_URL', '');
             
-            // If we're on Laravel Cloud production, construct the cloud URL directly
+            // If we're on Laravel Cloud production, use Laravel Cloud's storage system
             if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
-                // For cloud storage paths (without 'storage/' prefix), construct full URL
-                if (strpos($path, 'storage/') !== 0) {
-                    return rtrim($appUrl, '/') . '/storage/' . $path;
+                // Laravel Cloud automatically serves files from object storage
+                // The path should be relative to the storage root
+                if (strpos($path, 'storage/') === 0) {
+                    // Remove 'storage/' prefix for cloud storage
+                    $cleanPath = str_replace('storage/', '', $path);
+                    return rtrim($appUrl, '/') . '/storage/' . $cleanPath;
                 }
-                // If it already has storage/ prefix, use asset()
-                return asset($path);
+                // If no storage/ prefix, assume it's already a cloud path
+                return rtrim($appUrl, '/') . '/storage/' . $path;
             }
 
-            // For local development, check if path already has storage/ prefix
+            // For local development, use local storage with asset()
             if (strpos($path, 'storage/') !== 0) {
                 return asset('storage/' . $path);
             }

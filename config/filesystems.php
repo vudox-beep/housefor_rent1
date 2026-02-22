@@ -52,17 +52,13 @@ return [
         // Just reference the disk name you selected in the Infrastructure Canvas
         // Example: if you named it 'r2' or 'properties-storage'
 
+        // Laravel Cloud Object Storage - auto-configured by Laravel Cloud
+        // This disk is automatically configured by Laravel Cloud infrastructure
+        // No manual AWS credentials needed - Laravel Cloud manages everything
         'uploads' => [
-            'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'auto'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
+            'driver' => 'laravel-cloud',
             'visibility' => 'public',
+            'throw' => false,
         ],
 
 
