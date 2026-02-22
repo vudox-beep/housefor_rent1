@@ -29,17 +29,29 @@ if (!function_exists('imageUrl')) {
             
             // If we're on Laravel Cloud production, construct the cloud URL directly
             if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
-                // Laravel Cloud Object Storage uses a specific URL pattern
-                // The path should be the filename in the cloud bucket
-                return rtrim($appUrl, '/') . '/storage/' . $path;
+                // For cloud storage paths (without 'storage/' prefix), construct full URL
+                if (strpos($path, 'storage/') !== 0) {
+                    return rtrim($appUrl, '/') . '/storage/' . $path;
+                }
+                // If it already has storage/ prefix, use asset()
+                return asset($path);
             }
 
-            // For local development, use local storage path
-            return asset('storage/' . $path);
+            // For local development, check if path already has storage/ prefix
+            if (strpos($path, 'storage/') !== 0) {
+                return asset('storage/' . $path);
+            }
+            
+            return asset($path);
         } catch (\Throwable $e) {
             // If any error occurs, fallback to asset path
             Log::warning('imageUrl helper error: ' . $e->getMessage());
-            return asset('storage/' . $path);
+            
+            // Try to construct a URL regardless
+            if (strpos($path, 'storage/') !== 0) {
+                return asset('storage/' . $path);
+            }
+            return asset($path);
         }
     }
 }
