@@ -179,6 +179,19 @@
             </div>
         </div>
 
+        <!-- Promo Banner -->
+        <div style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%); margin: 3rem 0; padding: 2rem; border-radius: 12px; border: 1px solid rgba(217, 119, 6, 0.2);">
+            <div class="container">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.5rem; color: var(--primary-color);">Start Listing Properties for Free</h3>
+                        <p style="margin: 0; color: var(--muted-text); font-size: 1rem;">New users get a 1-month free trial to upload up to 20 images and 1 video per listing!</p>
+                    </div>
+                    <a href="{{ route('register') }}" class="btn-primary" style="white-space: nowrap;">Join Now</a>
+                </div>
+            </div>
+        </div>
+
         <!-- Categories Section -->
         <div class="categories-section">
             <div class="container">
