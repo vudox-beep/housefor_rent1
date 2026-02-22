@@ -468,21 +468,26 @@ class ListingController extends Controller
 
     /**
      * Determine which storage disk to use based on configuration
-     * For Laravel Cloud: uses the 'uploads' disk (Laravel Object Storage)
+     * For Laravel Cloud: uses the 'uploads' disk when connected
      * For local development: falls back to 'public' if cloud disk not available
      */
     private function getStorageDisk()
     {
-        // Laravel Cloud disk name: 'uploads'
-        $cloudDisk = 'uploads';
-        
-        // Try to use cloud disk first
+        // Try to use Laravel Cloud 'uploads' disk
         try {
-            if (Storage::disk($cloudDisk)->exists('/')) {
-                return $cloudDisk;
+            // Check if 'uploads' disk is actually configured
+            $disks = config('filesystems.disks');
+            if (!isset($disks['uploads'])) {
+                Log::debug('uploads disk not configured, using public');
+                return 'public';
+            }
+            
+            // Try to access the disk - if it exists and is working, use it
+            if (Storage::disk('uploads')->exists('.')) {
+                return 'uploads';
             }
         } catch (\Exception $e) {
-            Log::info('Cloud disk not available, using local storage: ' . $e->getMessage());
+            Log::debug('Cloud disk unavailable: ' . $e->getMessage());
         }
         
         // Fallback to public local storage
