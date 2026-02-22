@@ -53,10 +53,10 @@ return [
         // Example: if you named it 'r2' or 'properties-storage'
 
         // Laravel Cloud Object Storage - auto-configured by Laravel Cloud
-        // This disk is automatically configured by Laravel Cloud infrastructure
+        // This uses the 's3' driver but Laravel Cloud automatically provides the credentials
         // No manual AWS credentials needed - Laravel Cloud manages everything
         'uploads' => [
-            'driver' => 'laravel-cloud',
+            'driver' => 's3',
             'visibility' => 'public',
             'throw' => false,
         ],
