@@ -1,0 +1,49 @@
+:root {
+    --primary-color: #D97706; /* Warm Orange/Amber */
+    --primary-hover: #B45309;
+    --primary-brown: #3E2723; /* Dark Brown */
+    --secondary-brown: #5D4037;
+    --dark-text: #111827;     /* Almost Black */
+    --muted-text: #6B7280;    /* Gray */
+    --light-bg: #F9FAFB;      /* Very Light Gray */
+    --white: #FFFFFF;
+    --border-color: #E5E7EB;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius-lg: 16px;
+    --radius-md: 8px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Figtree', sans-serif;
+    background-color: var(--white); /* White background for the main body like the image */
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+ul {
+    list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--dark-text);
+    font-weight: 800; /* Bold headings */
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
