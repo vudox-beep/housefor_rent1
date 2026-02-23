@@ -10,6 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         // Modify the 'type' enum to include 'subscription'
         DB::statement("ALTER TABLE `payments` CHANGE `type` `type` ENUM('dealer_registration', 'promotion', 'subscription') NOT NULL");
     }
@@ -19,6 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         // Restore the original enum (remove 'subscription')
         DB::statement("ALTER TABLE `payments` CHANGE `type` `type` ENUM('dealer_registration', 'promotion') NOT NULL");
     }

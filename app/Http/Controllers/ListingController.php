@@ -191,7 +191,7 @@ class ListingController extends Controller
                 $disk = $this->getStorageDisk();
                 
                 // Store video on configured disk
-                $path = $videoFile->store('videos', $disk);
+                $path = $videoFile->store('videos', ['disk' => $disk]);
                 
                 // For local disk, prefix with 'storage/' for asset() compatibility
                 if ($disk === 'public') {
@@ -306,27 +306,38 @@ class ListingController extends Controller
         }
 
         $existingImages = is_array($listing->images) ? $listing->images : [];
+        
+        // Handle removal logic robustly
         $removeImages = $validated['remove_images'] ?? [];
-        $removeImages = array_values(array_intersect($existingImages, $removeImages));
-        $keptImages = array_values(array_diff($existingImages, $removeImages));
+        $keptImages = [];
 
-        foreach ($removeImages as $path) {
-            try {
-                if ($path !== '') {
-                    // Check if it's a cloud storage path (doesn't start with 'storage/')
-                    if (strpos($path, 'storage/') !== 0) {
-                        $disk = $this->getStorageDisk();
-                        Storage::disk($disk)->delete($path);
-                    } else {
-                        // Local storage path
-                        $storagePath = str_replace('storage/', 'app/public/', $path);
+        foreach ($existingImages as $existing) {
+            // If the existing image is NOT in the removal list, keep it
+            if (!in_array($existing, $removeImages)) {
+                $keptImages[] = $existing;
+            } else {
+                // If it IS in the removal list, delete it
+                try {
+                    $disk = $this->getStorageDisk();
+                    
+                    if ($disk === 'uploads') {
+                        // For cloud storage, try multiple path variations to ensure deletion
+                        $candidates = $this->cloudDeleteCandidates($existing);
+                        foreach ($candidates as $candidate) {
+                            if (Storage::disk($disk)->exists($candidate)) {
+                                Storage::disk($disk)->delete($candidate);
+                            }
+                        }
+                    } elseif ($disk === 'public') {
+                        // Local storage fallback
+                        $storagePath = str_replace('storage/', 'app/public/', $existing);
                         if (file_exists(storage_path($storagePath))) {
                             unlink(storage_path($storagePath));
                         }
                     }
+                } catch (\Exception $e) {
+                    Log::warning('Failed to delete image: ' . $e->getMessage());
                 }
-            } catch (\Exception $e) {
-                Log::warning('Failed to delete image: ' . $e->getMessage());
             }
         }
 
@@ -379,14 +390,14 @@ class ListingController extends Controller
             if ($removeVideo) {
                 try {
                     if ($existingVideo !== '') {
-                        // Check if it's a cloud storage path
-                        if (strpos($existingVideo, 'storage/') !== 0) {
-                            $disk = $this->getStorageDisk();
-                            Storage::disk($disk)->delete($existingVideo);
-                        } else {
+                        if ($disk === 'public') {
                             $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
                             if (file_exists(storage_path($storagePath))) {
                                 unlink(storage_path($storagePath));
+                            }
+                        } else {
+                            foreach ($this->cloudDeleteCandidates($existingVideo) as $key) {
+                                Storage::disk($disk)->delete($key);
                             }
                         }
                     }
@@ -398,22 +409,20 @@ class ListingController extends Controller
             } elseif ($request->hasFile('video_file')) {
                 try {
                     if ($existingVideo !== '') {
-                        // Delete existing video
-                        if (strpos($existingVideo, 'storage/') !== 0) {
-                            $disk = $this->getStorageDisk();
-                            Storage::disk($disk)->delete($existingVideo);
-                        } else {
+                        if ($disk === 'public') {
                             $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
                             if (file_exists(storage_path($storagePath))) {
                                 unlink(storage_path($storagePath));
+                            }
+                        } else {
+                            foreach ($this->cloudDeleteCandidates($existingVideo) as $key) {
+                                Storage::disk($disk)->delete($key);
                             }
                         }
                     }
 
                     $videoFile = $request->file('video_file');
-                    $disk = $this->getStorageDisk();
-                    
-                    $path = $videoFile->store('videos', $disk);
+                    $path = $videoFile->store('videos', ['disk' => $disk]);
                     
                     // For local disk, prefix with 'storage/'
                     if ($disk === 'public') {
@@ -505,4 +514,55 @@ class ListingController extends Controller
         
         // NEVER fall back to local storage - require cloud configuration
         throw new \Exception('Cloud storage not configured. Please set up Cloudflare R2/Laravel Cloud storage.');
-    }}
+    }
+
+    private function cloudDeleteCandidates($path): array
+    {
+        $value = trim((string) $path);
+        if ($value === '') {
+            return [];
+        }
+
+        // Remove query parameters if present
+        $value = explode('?', $value, 2)[0];
+
+        $candidates = [$value];
+
+        // If it's a full URL, parse path
+        if (preg_match('/^https?:\\/\\//i', $value)) {
+            $parsedPath = parse_url($value, PHP_URL_PATH);
+            if (is_string($parsedPath) && $parsedPath !== '') {
+                $candidates[] = ltrim($parsedPath, '/');
+            }
+        }
+
+        $bucket = (string) env('AWS_BUCKET', '');
+        
+        $keys = [];
+        foreach ($candidates as $candidate) {
+            // Normalize path
+            $candidate = ltrim((string) $candidate, '/');
+            
+            // 1. Try removing bucket name prefix if present
+            if ($bucket !== '' && str_starts_with($candidate, $bucket . '/')) {
+                $keys[] = substr($candidate, strlen($bucket) + 1);
+            }
+
+            // 2. Always include the candidate itself
+            $keys[] = $candidate;
+
+            // 3. Try removing storage/ prefix
+            if (str_starts_with($candidate, 'storage/')) {
+                $keys[] = substr($candidate, strlen('storage/'));
+            }
+            
+            // 4. Try removing uploads/ prefix
+            if (str_starts_with($candidate, 'uploads/')) {
+                $keys[] = substr($candidate, strlen('uploads/'));
+            }
+        }
+
+        return array_values(array_unique(array_filter($keys, fn ($k) => is_string($k) && $k !== '')));
+    }
+
+}

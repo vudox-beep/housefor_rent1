@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('listings')) {
+            return;
+        }
+
         // Update all listing image paths from uploads/ to storage/
         DB::table('listings')->orderBy('id')->chunk(100, function ($listings) {
             foreach ($listings as $listing) {
@@ -57,6 +61,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('listings')) {
+            return;
+        }
+
         // Revert paths back to uploads/
         DB::table('listings')->orderBy('id')->chunk(100, function ($listings) {
             foreach ($listings as $listing) {

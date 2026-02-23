@@ -23,9 +23,11 @@ return new class extends Migration
             }
         });
 
-        Schema::table('listings', function (Blueprint $table) {
-            $table->string('public_id')->nullable(false)->change();
-        });
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            Schema::table('listings', function (Blueprint $table) {
+                $table->string('public_id')->nullable(false)->change();
+            });
+        }
     }
 
     public function down(): void
@@ -36,4 +38,3 @@ return new class extends Migration
         });
     }
 };
-
