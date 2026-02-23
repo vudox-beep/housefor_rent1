@@ -28,13 +28,23 @@ if (!function_exists('imageUrl')) {
                 $cleanPath = strpos($path, 'storage/') === 0 ? 
                     str_replace('storage/', '', $path) : $path;
                 
-                // For older flysystem versions, construct the URL manually
-                $bucketName = env('AWS_BUCKET');
-                $endpoint = env('AWS_ENDPOINT');
+                // Laravel Cloud Object Storage auto-configuration
+                // Laravel Cloud provides these environment variables automatically:
+                $laravelCloudBucket = env('LARAVEL_CLOUD_OBJECT_STORAGE_BUCKET');
+                $laravelCloudEndpoint = env('LARAVEL_CLOUD_OBJECT_STORAGE_ENDPOINT');
+                $awsBucket = env('AWS_BUCKET');
+                $awsEndpoint = env('AWS_ENDPOINT');
+                
+                // Use Laravel Cloud variables first, then fallback to AWS variables
+                $bucketName = $laravelCloudBucket ?: $awsBucket;
+                $endpoint = $laravelCloudEndpoint ?: $awsEndpoint;
                 
                 if ($bucketName && $endpoint) {
-                    // Use endpoint if available (Laravel Cloud provides this)
+                    // Use the endpoint provided by Laravel Cloud
                     return rtrim($endpoint, '/') . '/' . $cleanPath;
+                } elseif ($bucketName === 'uploads') {
+                    // If bucket name is 'uploads' (your bucket name), construct URL
+                    return "https://uploads.r2.cloudflarestorage.com/{$cleanPath}";
                 } elseif ($bucketName) {
                     // Fallback: construct R2 URL format
                     return "https://{$bucketName}.r2.cloudflarestorage.com/{$cleanPath}";
