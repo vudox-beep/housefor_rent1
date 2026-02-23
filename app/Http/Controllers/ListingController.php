@@ -167,9 +167,6 @@ class ListingController extends Controller
                 try {
                     $disk = $this->getStorageDisk();
                     
-                    // Store image on configured disk (Laravel Cloud or local)
-                    // Note: We don't specify 'public' visibility here because Laravel Cloud R2 buckets
-                    // don't support mixing visibility and are often private by default.
                     $path = $image->store('properties', ['disk' => $disk]);
                     
                     // For local disk, prefix with 'storage/' for asset() compatibility
@@ -345,9 +342,6 @@ class ListingController extends Controller
                 try {
                     $disk = $this->getStorageDisk();
                     
-                    // Store image on configured disk
-                    // Note: We don't specify 'public' visibility here because Laravel Cloud R2 buckets
-                    // don't support mixing visibility and are often private by default.
                     $path = $image->store('properties', ['disk' => $disk]);
                     
                     // For local disk, prefix with 'storage/' for asset() compatibility
