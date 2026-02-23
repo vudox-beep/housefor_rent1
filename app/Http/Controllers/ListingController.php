@@ -400,9 +400,21 @@ class ListingController extends Controller
                         }
                     } elseif ($disk === 'public') {
                         // Local storage fallback
-                        $storagePath = str_replace('storage/', 'app/public/', $existing);
-                        if (file_exists(storage_path($storagePath))) {
-                            unlink(storage_path($storagePath));
+                        
+                        // Handle potential 'storage/' prefix in $existing
+                        $relativePath = str_starts_with($existing, 'storage/') 
+                            ? substr($existing, 8) 
+                            : $existing;
+                            
+                        // Try deleting using Storage facade first (preferred)
+                        if (Storage::disk('public')->exists($relativePath)) {
+                            Storage::disk('public')->delete($relativePath);
+                        } else {
+                            // Fallback to manual unlink if Storage check fails (e.g. symlink issues)
+                            $storagePath = storage_path('app/public/' . $relativePath);
+                            if (file_exists($storagePath)) {
+                                unlink($storagePath);
+                            }
                         }
                     }
                 } catch (\Exception $e) {
@@ -440,9 +452,17 @@ class ListingController extends Controller
                                 }
                             }
                         } elseif ($disk === 'public') {
-                             $storagePath = str_replace('storage/', 'app/public/', $kept);
-                             if (file_exists(storage_path($storagePath))) {
-                                unlink(storage_path($storagePath));
+                             $relativePath = str_starts_with($kept, 'storage/') 
+                                ? substr($kept, 8) 
+                                : $kept;
+                                
+                             if (Storage::disk('public')->exists($relativePath)) {
+                                Storage::disk('public')->delete($relativePath);
+                            } else {
+                                $storagePath = storage_path('app/public/' . $relativePath);
+                                if (file_exists($storagePath)) {
+                                    unlink($storagePath);
+                                }
                             }
                         }
                      } catch (\Exception $e) {
@@ -496,9 +516,17 @@ class ListingController extends Controller
                 try {
                     if ($existingVideo !== '') {
                         if ($disk === 'public') {
-                            $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
-                            if (file_exists(storage_path($storagePath))) {
-                                unlink(storage_path($storagePath));
+                            $relativePath = str_starts_with($existingVideo, 'storage/') 
+                                ? substr($existingVideo, 8) 
+                                : $existingVideo;
+                                
+                            if (Storage::disk('public')->exists($relativePath)) {
+                                Storage::disk('public')->delete($relativePath);
+                            } else {
+                                $storagePath = storage_path('app/public/' . $relativePath);
+                                if (file_exists($storagePath)) {
+                                    unlink($storagePath);
+                                }
                             }
                         } else {
                             foreach ($this->cloudDeleteCandidates($existingVideo) as $key) {
@@ -515,9 +543,17 @@ class ListingController extends Controller
                 try {
                     if ($existingVideo !== '') {
                         if ($disk === 'public') {
-                            $storagePath = str_replace('storage/', 'app/public/', $existingVideo);
-                            if (file_exists(storage_path($storagePath))) {
-                                unlink(storage_path($storagePath));
+                            $relativePath = str_starts_with($existingVideo, 'storage/') 
+                                ? substr($existingVideo, 8) 
+                                : $existingVideo;
+                                
+                            if (Storage::disk('public')->exists($relativePath)) {
+                                Storage::disk('public')->delete($relativePath);
+                            } else {
+                                $storagePath = storage_path('app/public/' . $relativePath);
+                                if (file_exists($storagePath)) {
+                                    unlink($storagePath);
+                                }
                             }
                         } else {
                             foreach ($this->cloudDeleteCandidates($existingVideo) as $key) {
