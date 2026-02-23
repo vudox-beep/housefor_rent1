@@ -475,7 +475,7 @@ class ListingController extends Controller
             }
         }
 
-        $finalImages = $maxImages === 1 ? $newImagePaths : array_values(array_merge($keptImages, $newImagePaths));
+        $finalImages = array_values(array_merge($keptImages, $newImagePaths));
 
         if (count($finalImages) < 1) {
             return back()->withErrors(['images' => 'Please keep at least 1 image for your listing.'])->withInput();
