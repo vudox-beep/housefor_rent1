@@ -22,38 +22,31 @@ if (!function_exists('imageUrl')) {
             $isProduction = env('APP_ENV') === 'production';
             $appUrl = env('APP_URL', '');
             
-            // If we're on Laravel Cloud production, generate signed URLs for R2 storage
-            if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
+            // If we're on Laravel Cloud production OR forcing cloud storage locally
+            if (($isProduction && str_contains($appUrl, '.laravel.cloud')) || env('FORCE_CLOUD_STORAGE', false)) {
                 // Get clean path without 'storage/' prefix
                 $cleanPath = strpos($path, 'storage/') === 0 ? 
                     str_replace('storage/', '', $path) : $path;
                 
-                // Laravel Cloud Object Storage auto-configuration
-                // Laravel Cloud provides these environment variables automatically:
-                $laravelCloudBucket = env('LARAVEL_CLOUD_OBJECT_STORAGE_BUCKET');
-                $laravelCloudEndpoint = env('LARAVEL_CLOUD_OBJECT_STORAGE_ENDPOINT');
-                $awsBucket = env('AWS_BUCKET');
-                $awsEndpoint = env('AWS_ENDPOINT');
-                
-                // Use Laravel Cloud variables first, then fallback to AWS variables
-                $bucketName = $laravelCloudBucket ?: $awsBucket;
-                $endpoint = $laravelCloudEndpoint ?: $awsEndpoint;
-                
-                if ($bucketName && $endpoint) {
-                    // Use the endpoint provided by Laravel Cloud
-                    return rtrim($endpoint, '/') . '/' . $cleanPath;
-                } elseif ($bucketName === 'uploads') {
-                    // If bucket name is 'uploads' (your bucket name), construct URL
-                    return "https://uploads.r2.cloudflarestorage.com/{$cleanPath}";
-                } elseif ($bucketName) {
-                    // Fallback: construct R2 URL format
-                    return "https://{$bucketName}.r2.cloudflarestorage.com/{$cleanPath}";
+                try {
+                    // Use temporary signed URLs for secure, time-limited access
+                    // This is required for private R2 buckets on Laravel Cloud
+                    /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+                    $disk = Storage::disk('uploads');
+                    
+                    return $disk->temporaryUrl(
+                        $cleanPath,
+                        now()->addMinutes(60)
+                    );
+                } catch (\Throwable $e) {
+                    // Log the error but try to return a public URL as fallback
+                    Log::error('R2 temporaryUrl generation failed: ' . $e->getMessage());
+                    
+                    // Fallback to direct URL if signed URL fails (unlikely to work for private buckets)
+                    /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+                    $disk = Storage::disk('uploads');
+                    return $disk->url($cleanPath);
                 }
-                
-                // Final fallback: use asset() with the clean path
-                 
-                 // Final fallback: use asset() with the clean path
-                 return asset('storage/' . $cleanPath);
             }
 
             // For local development, use local storage with asset()
