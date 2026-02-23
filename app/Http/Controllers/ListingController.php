@@ -588,44 +588,28 @@ class ListingController extends Controller
      */
     private function getStorageDisk()
     {
-        // NEVER use local storage - always use cloud storage (Cloudflare R2/Laravel Cloud)
-        // This ensures images persist and never disappear
+        // Check for Cloudflare R2 / AWS S3 Configuration
+        // Prioritize cloud storage if explicitly configured for production
+        // But for now, user requested to use local storage to ensure images show and delete correctly
+        // So we will default to 'public' unless specific ENV variable forces cloud
         
-        $isProduction = env('APP_ENV') === 'production';
-        $appUrl = env('APP_URL', '');
-        
-        // On production (Laravel Cloud), cloud storage MUST work
-        if ($isProduction && str_contains($appUrl, '.laravel.cloud')) {
-            try {
+        if (env('FORCE_CLOUD_STORAGE', false)) {
+             try {
                 // Use the 'uploads' disk (Laravel Cloud Object Storage)
-                // Laravel Cloud automatically configures S3-compatible storage
                 return 'uploads';
             } catch (\Exception $e) {
-                // Production requires cloud storage - throw error if it fails
-                throw new \Exception('Cloud storage required for production: ' . $e->getMessage());
+                // Fallback to public if cloud fails, or throw if strict
+                Log::warning('Cloud storage forced but failed: ' . $e->getMessage());
             }
         }
         
-        // For local development, still prefer cloud storage if configured
-        $cloudConfigured = env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') && env('AWS_BUCKET');
-        
-        if ($cloudConfigured || env('FORCE_CLOUD_STORAGE', false)) {
-            try {
-                // Use the 'uploads' disk (Cloudflare R2)
-                // Don't check existence - just use the disk directly
-                return 'uploads';
-            } catch (\Exception $e) {
-                // If cloud fails locally, throw error instead of using local storage
-                throw new \Exception('Cloud storage configuration required: ' . $e->getMessage());
-            }
-        }
-        
-        // NEVER fall back to local storage - require cloud configuration
-        throw new \Exception('Cloud storage not configured. Please set up Cloudflare R2/Laravel Cloud storage.');
+        // Default to local public storage for reliability as requested
+        return 'public';
     }
 
     private function cloudDeleteCandidates($path): array
     {
+        // Keep this method for backward compatibility if we switch back to cloud
         $value = trim((string) $path);
         if ($value === '') {
             return [];
