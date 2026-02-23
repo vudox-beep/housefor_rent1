@@ -312,8 +312,53 @@ class ListingController extends Controller
         $keptImages = [];
 
         foreach ($existingImages as $existing) {
-            // If the existing image is NOT in the removal list, keep it
-            if (!in_array($existing, $removeImages)) {
+            // Check if existing image is in removal list (loose comparison for robustness)
+            $shouldRemove = false;
+            foreach ($removeImages as $remove) {
+                // 1. Direct equality check (most reliable if frontend sends exact path)
+                if ($remove == $existing) {
+                    $shouldRemove = true;
+                    break;
+                }
+
+                // Decode HTML entities in the removal path (in case &amp; was passed)
+                $decodedRemove = html_entity_decode($remove);
+                
+                // Compare raw paths
+                if ($decodedRemove == $existing) {
+                    $shouldRemove = true;
+                    break;
+                }
+                
+                // Compare with signed URL stripping (in case full URL was passed)
+                $cleanRemove = explode('?', $decodedRemove)[0];
+                
+                // Decode URL-encoded characters (e.g. %20 -> space)
+                $cleanRemove = urldecode($cleanRemove);
+                
+                // Handle temporaryUrl domain mismatch (if different R2 endpoint used)
+                // Extract just the path component if it's a URL
+                if (filter_var($cleanRemove, FILTER_VALIDATE_URL)) {
+                    $urlPath = parse_url($cleanRemove, PHP_URL_PATH);
+                    // Remove leading slash
+                    $urlPath = ltrim($urlPath ?? '', '/');
+                    if (str_ends_with($urlPath, $existing)) {
+                        $shouldRemove = true;
+                        break;
+                    }
+                }
+
+                // Remove leading slash from both for comparison
+                $normalizedCleanRemove = ltrim($cleanRemove, '/');
+                $normalizedExisting = ltrim($existing, '/');
+                
+                if (str_contains($normalizedCleanRemove, $normalizedExisting)) {
+                    $shouldRemove = true;
+                    break;
+                }
+            }
+
+            if (!$shouldRemove) {
                 $keptImages[] = $existing;
             } else {
                 // If it IS in the removal list, delete it
@@ -323,6 +368,31 @@ class ListingController extends Controller
                     if ($disk === 'uploads') {
                         // For cloud storage, try multiple path variations to ensure deletion
                         $candidates = $this->cloudDeleteCandidates($existing);
+                        
+                        // Also try to delete the exact path from remove list if it's a relative path
+                        // This handles cases where $existing matches the DB but maybe file is stored differently?
+                        // No, $existing IS the path stored in DB.
+                        
+                        // Let's add more candidates based on the REMOVE value itself
+                        // This is crucial because sometimes the frontend sends a full URL that might differ slightly
+                        // from what we derive from $existing
+                        
+                        foreach ($removeImages as $remove) {
+                             $decodedRemove = html_entity_decode($remove);
+                             $cleanRemove = explode('?', $decodedRemove)[0];
+                             $cleanRemove = urldecode($cleanRemove);
+                             
+                             if (filter_var($cleanRemove, FILTER_VALIDATE_URL)) {
+                                 $urlPath = parse_url($cleanRemove, PHP_URL_PATH);
+                                 $urlPath = ltrim($urlPath ?? '', '/');
+                                 if (str_ends_with($urlPath, $existing)) {
+                                     // This removal request matches this existing image
+                                     // Add this specific path as candidate too
+                                     $candidates[] = $urlPath;
+                                 }
+                             }
+                        }
+                        
                         foreach ($candidates as $candidate) {
                             if (Storage::disk($disk)->exists($candidate)) {
                                 Storage::disk($disk)->delete($candidate);
@@ -340,11 +410,46 @@ class ListingController extends Controller
                 }
             }
         }
+        
+        // Update the listing with kept images
+        $listing->images = array_values($keptImages);
+        // Explicitly set the attribute on the model, just to be sure
+        $listing->setAttribute('images', array_values($keptImages));
+        
+        // Ensure changes are persisted. 
+        // We do this by forcing the updateData to contain the new images array.
+        // This ensures that when $listing->update($updateData) is called later, it uses our filtered array.
+        $validated['images'] = array_values($keptImages);
 
         $newImagePaths = [];
         if ($request->hasFile('images')) {
             $images = $request->file('images');
             if ($maxImages === 1) {
+                // If max images is 1, and we are uploading a new one, we should remove the old one(s)
+                // The current logic clears $keptImages, which means the old image path is removed from DB
+                // BUT we should also physically delete it if it wasn't already in remove_images
+                
+                foreach ($keptImages as $kept) {
+                     try {
+                        $disk = $this->getStorageDisk();
+                        if ($disk === 'uploads') {
+                             $candidates = $this->cloudDeleteCandidates($kept);
+                             foreach ($candidates as $candidate) {
+                                if (Storage::disk($disk)->exists($candidate)) {
+                                    Storage::disk($disk)->delete($candidate);
+                                }
+                            }
+                        } elseif ($disk === 'public') {
+                             $storagePath = str_replace('storage/', 'app/public/', $kept);
+                             if (file_exists(storage_path($storagePath))) {
+                                unlink(storage_path($storagePath));
+                            }
+                        }
+                     } catch (\Exception $e) {
+                        Log::warning('Failed to delete old image for single-image replacement: ' . $e->getMessage());
+                     }
+                }
+                
                 $keptImages = [];
                 $images = array_slice($images, 0, 1);
             }
@@ -445,8 +550,11 @@ class ListingController extends Controller
 
         $updateData = $validated;
         unset($updateData['images'], $updateData['remove_images'], $updateData['video_file'], $updateData['video_url'], $updateData['remove_video']);
-        $updateData['images'] = $finalImages;
-        $updateData['video_path'] = $canUploadVideo ? $videoPath : null;
+        // Re-assign images from our calculated array. 
+        // This is crucial because $validated['images'] is filtered out above, 
+        // and we need to ensure the final list (kept + new) is saved.
+        $updateData['images'] = array_values($finalImages); 
+        $updateData['video_path'] = $videoPath; 
         $updateData['agent_id'] = $validated['agent_id'] ?? null;
 
         $listing->update($updateData);

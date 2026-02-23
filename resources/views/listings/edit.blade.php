@@ -200,7 +200,7 @@
                                     <img src="{{ imageUrl($img) }}" alt="Listing image" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
                                 <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem; font-size: 0.85rem; color: var(--muted-text);">
-                                    <input type="checkbox" name="remove_images[]" value="{{ $img }}">
+                                    <input type="checkbox" name="remove_images[]" value="{{ $img }}" @checked(in_array($img, old('remove_images', [])))>
                                     Remove
                                 </label>
                             </div>
