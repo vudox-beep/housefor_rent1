@@ -626,10 +626,8 @@ class ListingController extends Controller
     {
         // Check for Cloudflare R2 / AWS S3 Configuration
         // Prioritize cloud storage if explicitly configured for production
-        // But for now, user requested to use local storage to ensure images show and delete correctly
-        // So we will default to 'public' unless specific ENV variable forces cloud
         
-        if (env('FORCE_CLOUD_STORAGE', false)) {
+        if (env('FILESYSTEM_DISK') === 'uploads' || env('FILESYSTEM_DISK') === 's3' || env('FORCE_CLOUD_STORAGE', false)) {
              try {
                 // Use the 'uploads' disk (Laravel Cloud Object Storage)
                 return 'uploads';

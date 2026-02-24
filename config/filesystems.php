@@ -61,14 +61,14 @@ return [
         // - LARAVEL_CLOUD_OBJECT_STORAGE_ENDPOINT (AWS_ENDPOINT)
         'uploads' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'auto'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => true,
-            'visibility' => 'private', // Explicitly private
+            'key' => env('LARAVEL_CLOUD_OBJECT_STORAGE_KEY', env('AWS_ACCESS_KEY_ID')),
+            'secret' => env('LARAVEL_CLOUD_OBJECT_STORAGE_SECRET', env('AWS_SECRET_ACCESS_KEY')),
+            'region' => env('LARAVEL_CLOUD_OBJECT_STORAGE_REGION', env('AWS_DEFAULT_REGION', 'auto')),
+            'bucket' => env('LARAVEL_CLOUD_OBJECT_STORAGE_BUCKET', env('AWS_BUCKET')),
+            'url' => env('LARAVEL_CLOUD_OBJECT_STORAGE_URL', env('AWS_URL')),
+            'endpoint' => env('LARAVEL_CLOUD_OBJECT_STORAGE_ENDPOINT', env('AWS_ENDPOINT')),
+            'use_path_style_endpoint' => false,
+            'visibility' => 'public',
             'throw' => false,
         ],
 
